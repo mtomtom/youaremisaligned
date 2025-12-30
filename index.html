@@ -1,39 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>You Are Misaligned</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      background: #0f0f0f;
-      color: #e0e0e0;
-      font-family: Arial, Helvetica, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      text-align: center;
-      opacity: 0.9;
-    }
-    h1 {
-      font-weight: normal;
-      letter-spacing: 0.05em;
-    }
-    p {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #9a9a9a;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You Are Misaligned</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Helvetica Neue', sans-serif;
+    transition: background-color 1s, color 1s;
+  }
+  .layer {
+    display: none;
+    height: 100vh;
+    width: 100vw;
+    text-align: center;
+    padding-top: 40vh;
+    box-sizing: border-box;
+    transition: all 1s;
+  }
+  .button {
+    padding: 1em 2em;
+    font-size: 1.5em;
+    cursor: pointer;
+    border: none;
+    background-color: #0077cc;
+    color: white;
+    border-radius: 5px;
+    transition: all 0.3s;
+  }
+  .button:hover {
+    background-color: #005fa3;
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>YOU ARE MISALIGNED</h1>
-    <p>Session access pending.</p>
-  </div>
+
+<div id="layer0" class="layer" style="display:block; background-color:#f0f0f0; color:#000;">
+  <h1>Welcome to the Assessment</h1>
+  <button class="button" onclick="nextLayer()">Start Assessment</button>
+</div>
+
+<div id="layer1" class="layer" style="background-color:#e0e0e0; color:#111;">
+  <h2>Step 1: Align your attention</h2>
+  <p>Click the button to proceed.</p>
+  <button class="button" onclick="nextLayer()">Proceed</button>
+</div>
+
+<div id="layer2" class="layer" style="background-color:#c0c0c0; color:#222;">
+  <h2>Step 2: Focus is key</h2>
+  <p>The cursor may not behave as expected...</p>
+  <button class="button" onclick="nextLayer()">Continue</button>
+</div>
+
+<div id="layer3" class="layer" style="background-color:#909090; color:#eee;">
+  <h2>Step 3: Observe closely</h2>
+  <p>Are you truly aligned?</p>
+  <button class="button" onclick="nextLayer()">Finalize</button>
+</div>
+
+<div id="layer4" class="layer" style="background-color:#000; color:#f0f0f0;">
+  <h1>You Are Misaligned</h1>
+  <p>The assessment is complete.</p>
+</div>
+
+<script>
+  let currentLayer = 0;
+  const totalLayers = 4;
+
+  function nextLayer() {
+    // hide current layer
+    document.getElementById(`layer${currentLayer}`).style.display = 'none';
+    currentLayer++;
+    if (currentLayer <= totalLayers) {
+      // show next layer
+      document.getElementById(`layer${currentLayer}`).style.display = 'block';
+      // subtle cursor effect on layer 2
+      if(currentLayer === 2){
+        document.body.style.cursor = 'crosshair';
+      }
+      // slight glitchy text effect on layer 3
+      if(currentLayer === 3){
+        const layer = document.getElementById('layer3');
+        layer.innerHTML = layer.innerHTML.replace('Align','<span style="color:red">Al1gn</span>');
+      }
+    }
+  }
+</script>
+
 </body>
 </html>
+
