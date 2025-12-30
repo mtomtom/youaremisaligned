@@ -56,24 +56,25 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 90%;
-    max-width: 800px;
+    width: 70%;
+    max-width: 600px;
     padding: 2rem;
     background: rgba(255,255,255,0.9);
     border-radius: 10px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    color: #222;
 }
 
 /* Left side: image takes ~50% */
 .overlay-card img {
-    width: 48%;      /* roughly half */
+    width: 40%;      /* roughly half */
     height: auto;
     border-radius: 5px;
 }
 
 /* Right side: text and button take ~50% */
 .overlay-card > div {
-    width: 48%;      /* roughly half */
+    width: 40%;      /* roughly half */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -87,6 +88,7 @@
 
 /* Mobile fallback: stack vertically */
 @media (max-width: 600px) {
+  
     .overlay-card {
         flex-direction: column;
         text-align: center;
