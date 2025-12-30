@@ -3,107 +3,145 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>You Are Misaligned</title>
+<title>The Focus Room</title>
 <style>
-  body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
+  body, html {
     margin: 0;
     padding: 0;
-    background: #fff;
-    color: #333;
-    line-height: 1.6;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    height: 100%;
+    color: #fff;
   }
-  header {
-    background: #fff;
-    padding: 2rem 1rem;
-    text-align: center;
-    border-bottom: 1px solid #eee;
+
+  /* Top navigation bar */
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 3%;
+    position: fixed;
+    width: 94%;
+    z-index: 10;
+    background: rgba(0,0,0,0.5); /* semi-transparent to overlay background */
   }
-  header h1 {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    font-size: 2rem;
+
+  nav .logo {
+    font-size: 1.8rem;
+    font-weight: bold;
   }
-  header p {
-    font-size: 1.1rem;
-    color: #555;
-  }
-  .hero {
-    text-align: center;
-    padding: 3rem 1rem;
-    max-width: 900px;
-    margin: auto;
-  }
-  .hero img {
-    max-width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    margin-bottom: 1.5rem;
-  }
-  .cta-button {
-    display: inline-block;
-    margin-top: 1.5rem;
-    padding: 1rem 2rem;
-    background: #0077cc;
+
+  nav .tabs a {
     color: #fff;
     text-decoration: none;
-    font-size: 1.15rem;
+    margin-left: 2rem;
     font-weight: 500;
-    border-radius: 5px;
-    transition: background 0.3s ease;
+    transition: color 0.3s;
   }
-  .cta-button:hover {
-    background: #005fa3;
+
+  nav .tabs a:hover {
+    color: #00aced;
   }
-  .images {
+
+  /* Hero section with background image */
+  .hero {
+    position: relative;
+    height: 75vh;
+    background: url('clinic-outside.jpg') center/cover no-repeat;
     display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
     justify-content: center;
-    margin: 2rem 0;
+    align-items: center;
   }
-  .images img {
-    width: calc(50% - 1rem);
-    border-radius: 8px;
-    object-fit: cover;
+
+  /* Overlay card */
+  .overlay-card {
+    background: rgba(255,255,255,0.9);
+    color: #333;
+    width: 90%;
+    max-width: 500px;
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
   }
-  @media (max-width: 600px) {
-    .images img {
-      width: 100%;
-    }
+
+  .overlay-card img {
+    width: 100px;
+    border-radius: 5px;
+    margin-bottom: 1rem;
   }
+
+  .overlay-card h2 {
+    margin: 0.5rem 0;
+  }
+
+  .cta-button {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    background-color: #0077cc;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 1rem;
+    font-weight: 500;
+    transition: background 0.3s;
+  }
+
+  .cta-button:hover {
+    background-color: #005fa3;
+  }
+
+  /* Footer */
   footer {
     text-align: center;
-    padding: 2rem 1rem;
-    color: #777;
-    font-size: 0.9rem;
-    border-top: 1px solid #eee;
+    padding: 2rem;
+    background: #111;
+    color: #ccc;
+  }
+
+  @media (max-width: 600px) {
+    nav {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    nav .tabs {
+      margin-top: 0.5rem;
+    }
+    .overlay-card img {
+      width: 80px;
+    }
   }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>The Focus Room</h1>
-  <p>Professional assessment and subtle focus experiences</p>
-</header>
+<!-- Navigation -->
+<nav>
+  <div class="logo">The Focus Room</div>
+  <div class="tabs">
+    <a href="#">Home</a>
+    <a href="#">Sessions</a>
+    <a href="#">About</a>
+    <a href="#">Contact</a>
+  </div>
+</nav>
 
+<!-- Hero Section -->
 <section class="hero">
-  <img src="clinic_outside.png" alt="Outside of the clinic">
-  <p>Your journey begins here.</p>
-  <a href="#" class="cta-button">Check Alignment</a>
-</section>
-
-<section class="images">
-  <img src="clinic_inside.png" alt="Inside of the clinic">
+  <div class="overlay-card">
+    <img src="clinic_inside.png" alt="Inside the clinic">
+    <h2>Begin Your Alignment</h2>
+    <p>Professional assessment and subtle focus experiences await you.</p>
+    <a href="#" class="cta-button">Check Alignment</a>
+  </div>
 </section>
 
 <footer>
-  &copy; 2025 You Are Misaligned. All rights reserved.
+  &copy; 2025 The Focus Room. All rights reserved.
 </footer>
 
 </body>
 </html>
+
 
 
 
