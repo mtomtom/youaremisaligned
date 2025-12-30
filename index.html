@@ -53,22 +53,23 @@
   }
 
   /* Overlay card */
-  .overlay-card {
-    background: rgba(255,255,255,0.9);
-    color: #333;
-    width: 90%;
-    max-width: 500px;
-    padding: 1.5rem;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  }
+  /* Make the overlay-card a flex container */
+.overlay-card {
+    display: flex;
+    align-items: center;      /* vertically center content */
+    gap: 1.5rem;              /* space between image and text */
+    padding: 2rem;
+    text-align: left;         /* text on the right */
+}
 
-  .overlay-card img {
-    width: 100px;
+/* Make the image larger and on the left */
+.overlay-card img {
+    width: 180px;             /* larger width */
+    height: auto;
     border-radius: 5px;
-    margin-bottom: 1rem;
-  }
+    flex-shrink: 0;           /* prevent shrinking */
+}
+
 
   .overlay-card h2 {
     margin: 0.5rem 0;
