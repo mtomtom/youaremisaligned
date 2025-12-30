@@ -52,28 +52,52 @@
     align-items: center;
   }
 
-  /* Overlay card */
-  /* Make the overlay-card a flex container */
-.overlay-card {
+  .overlay-card {
     display: flex;
-    align-items: center;      /* vertically center content */
-    gap: 1.5rem;              /* space between image and text */
+    align-items: center;
+    justify-content: space-between;
+    width: 90%;
+    max-width: 800px;
     padding: 2rem;
-    text-align: left;         /* text on the right */
+    background: rgba(255,255,255,0.9);
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
 }
 
-/* Make the image larger and on the left */
+/* Left side: image takes ~50% */
 .overlay-card img {
-    width: 180px;             /* larger width */
+    width: 48%;      /* roughly half */
     height: auto;
     border-radius: 5px;
-    flex-shrink: 0;           /* prevent shrinking */
 }
 
+/* Right side: text and button take ~50% */
+.overlay-card > div {
+    width: 48%;      /* roughly half */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
-  .overlay-card h2 {
-    margin: 0.5rem 0;
-  }
+/* Optional: center CTA under text */
+.overlay-card .cta-button {
+    margin-top: 1.5rem;
+    align-self: flex-start; /* left-aligned; change to center if desired */
+}
+
+/* Mobile fallback: stack vertically */
+@media (max-width: 600px) {
+    .overlay-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    .overlay-card img, .overlay-card > div {
+        width: 100%;
+    }
+    .overlay-card .cta-button {
+        align-self: center;
+    }
+}
 
   .cta-button {
     display: inline-block;
