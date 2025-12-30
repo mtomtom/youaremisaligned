@@ -73,8 +73,8 @@
 }
 
 /* Right side: text and button take ~50% */
-.overlay-card > div {
-    width: 40%;      /* roughly half */
+.text-content {
+    width: 40%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -133,9 +133,6 @@
     nav .tabs {
       margin-top: 0.5rem;
     }
-    .overlay-card img {
-      width: 80px;
-    }
   }
 </style>
 </head>
@@ -156,10 +153,14 @@
 <section class="hero">
   <div class="overlay-card">
     <img src="clinic_inside.png" alt="Inside the clinic">
-    <p>Professional assessment and subtle focus experiences await you.</p>
-    <a href="#" class="cta-button">Check Alignment</a>
+
+    <div class="text-content">
+      <p>Professional assessment and subtle focus experiences await you.</p>
+      <a href="#" class="cta-button">Check Alignment</a>
+    </div>
   </div>
 </section>
+
 
 <footer>
   &copy; 2025 The Focus Room. All rights reserved.
