@@ -3,36 +3,91 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Focus Room - Stage 2</title>
+<title>The Focus Room - Next Page</title>
 <style>
-body, html {
-  margin: 0;
-  padding: 0;
-  font-family: 'Helvetica Neue', Arial, sans-serif;
-  background-color: #111;  /* darker than first page */
-  color: #fff;
-  height: 100%;
-}
-.hero {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-.overlay-card {
-  padding: 2rem;
-  background: rgba(255,255,255,0.05); /* slightly visible */
-  border-radius: 10px;
-  text-align: center;
-}
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #111;
+    color: #fff;
+    overflow: hidden;
+  }
+
+  #tricky-btn {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    background: #0077cc;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    position: absolute;
+    transition: transform 0.2s;
+  }
+
+  /* Shrink slightly on hover */
+  #tricky-btn:hover {
+    transform: scale(0.8);
+  }
 </style>
 </head>
 <body>
-<section class="hero">
-  <div class="overlay-card">
-    <p>Welcome to Stage 2...</p>
-    <a href="nextstage.html" class="cta-button">Continue</a>
-  </div>
-</section>
+
+<button id="tricky-btn">Continue</button>
+
+<script>
+const btn = document.getElementById('tricky-btn');
+const labels = ["Keep Trying", "Not Yet", "Almost..."];
+
+let btnX = window.innerWidth / 2 - btn.offsetWidth / 2;
+let btnY = window.innerHeight / 2 - btn.offsetHeight / 2;
+
+btn.style.left = btnX + 'px';
+btn.style.top = btnY + 'px';
+
+document.addEventListener('mousemove', (e) => {
+  const rect = btn.getBoundingClientRect();
+  const mouseX = e.clientX;
+  const mouseY = e.clientY;
+
+  const distX = mouseX - (rect.left + rect.width / 2);
+  const distY = mouseY - (rect.top + rect.height / 2);
+  const distance = Math.sqrt(distX*distX + distY*distY);
+
+  if(distance < 120){ // adjust how close before it moves
+    // move button away from cursor
+    btnX -= distX / Math.abs(distX) * 50;
+    btnY -= distY / Math.abs(distY) * 50;
+
+    // keep inside viewport
+    btnX = Math.max(0, Math.min(window.innerWidth - rect.width, btnX));
+    btnY = Math.max(0, Math.min(window.innerHeight - rect.height, btnY));
+
+    btn.style.left = btnX + 'px';
+    btn.style.top = btnY + 'px';
+  }
+});
+
+// Change label randomly on hover
+btn.addEventListener('mouseenter', () => {
+  btn.textContent = labels[Math.floor(Math.random() * labels.length)];
+});
+
+btn.addEventListener('mouseleave', () => {
+  btn.textContent = "Continue";
+});
+
+// Optional: click to advance
+btn.addEventListener('click', () => {
+  alert("You've advanced… or have you?"); // placeholder for next page
+});
+</script>
+
 </body>
 </html>
+
