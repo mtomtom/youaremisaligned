@@ -177,14 +177,10 @@ button.addEventListener('click', (e) => {
   e.preventDefault();
 
   // Swap inside image
-  insideImg.src = 'clinic_inside_glitched.png';
+  insideImg.src = 'glitch_clinic_inside.png';
 
   // Swap hero background image
-  heroSection.style.backgroundImage = "url('clinic_outside_glitched.png')";
-
-  // Optional: add glitch animation class
-  heroSection.classList.add('glitch-effect');
-  insideImg.classList.add('glitch-effect');
+  heroSection.style.backgroundImage = "url('glitch_clinic_outside.png')";
 
   // After 0.5 seconds, move to next page
   setTimeout(() => {
