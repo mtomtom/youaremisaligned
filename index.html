@@ -122,9 +122,6 @@
     background-color: #005fa3;
   }
 
-  <a href="#" id="check-alignment" class="cta-button">Check Alignment</a>
-
-
   /* Footer */
   footer {
     text-align: center;
@@ -160,11 +157,11 @@
 <!-- Hero Section -->
 <section class="hero">
   <div class="overlay-card">
-    <img src="clinic_inside.png" alt="Inside the clinic">
+    <img id="hero-img" src="clinic_inside.png" alt="Inside the clinic">
 
     <div class="text-content">
       <p>Professional assessment and subtle focus experiences await you.</p>
-      <a href="#" class="cta-button">Check Alignment</a>
+      <a href="#" id="check-alignment" class="cta-button">Check Alignment</a>
     </div>
   </div>
 </section>
@@ -177,10 +174,7 @@ button.addEventListener('click', (e) => {
   e.preventDefault(); // prevent default link behavior
 
   // Swap to glitched image
-  heroImg.src = 'clinic_outside_glitched.png';
-
-  // Optional: add a CSS glitch animation
-  heroImg.classList.add('glitch-effect');
+  heroImg.src = 'glitch_clinic_outside.png';
 
   // Hold for 0.5 seconds, then move to next page
   setTimeout(() => {
