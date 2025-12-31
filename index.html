@@ -157,31 +157,38 @@
 <!-- Hero Section -->
 <section class="hero">
   <div class="overlay-card">
-    <img id="hero-img" src="clinic_inside.png" alt="Inside the clinic">
+    <!-- Outside image -->
+    <img id="hero-img" src="clinic_outside.png" alt="Outside the clinic">
+    <!-- Inside image -->
+    <img id="inside-img" src="clinic_inside.png" alt="Inside the clinic">
 
     <div class="text-content">
       <p>Professional assessment and subtle focus experiences await you.</p>
       <a href="#" id="check-alignment" class="cta-button">Check Alignment</a>
     </div>
-  </div>
+</div>
+
 </section>
 
 <script>
 const button = document.getElementById('check-alignment');
 const heroImg = document.getElementById('hero-img');
+const insideImg = document.getElementById('inside-img');
 
 button.addEventListener('click', (e) => {
-  e.preventDefault(); // prevent default link behavior
+  e.preventDefault();
 
-  // Swap to glitched image
-  heroImg.src = 'glitch_clinic_outside.png';
+  // Swap to glitched images
+  heroImg.src = 'clinic_outside_glitched.png';
+  insideImg.src = 'clinic_inside_glitched.png';
 
-  // Hold for 0.5 seconds, then move to next page
+  // After 0.5 seconds, move to next page
   setTimeout(() => {
-    window.location.href = 'nextpage.html'; // replace with your next page
+    window.location.href = 'nextpage.html'; // replace with your second page
   }, 500);
 });
 </script>
+
 
 
 
