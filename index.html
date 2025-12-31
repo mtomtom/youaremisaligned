@@ -122,6 +122,9 @@
     background-color: #005fa3;
   }
 
+  <a href="#" id="check-alignment" class="cta-button">Check Alignment</a>
+
+
   /* Footer */
   footer {
     text-align: center;
@@ -165,6 +168,27 @@
     </div>
   </div>
 </section>
+
+<script>
+const button = document.getElementById('check-alignment');
+const heroImg = document.getElementById('hero-img');
+
+button.addEventListener('click', (e) => {
+  e.preventDefault(); // prevent default link behavior
+
+  // Swap to glitched image
+  heroImg.src = 'clinic_outside_glitched.png';
+
+  // Optional: add a CSS glitch animation
+  heroImg.classList.add('glitch-effect');
+
+  // Hold for 0.5 seconds, then move to next page
+  setTimeout(() => {
+    window.location.href = 'nextpage.html'; // replace with your next page
+  }, 500);
+});
+</script>
+
 
 
 <footer>
