@@ -182,31 +182,28 @@ footer {
   animation: heroGlitch 0.8s linear;
 }
 
-/* ===== Persistent Fake Ads ===== */
-.ad-container {
+.sponsor-shell {
   position: fixed;
   bottom: 20px;
   right: 20px;
   width: 220px;
   z-index: 99999;
   font-family: 'Comic Neue', Arial, sans-serif;
-  display: block;
   pointer-events: auto;
 }
 
-.ad-unit {
+.sponsor-card {
   background: #f1f1f1;
   color: #111;
   border: 1px solid #ccc;
   padding: 0.75rem;
   font-size: 0.85rem;
   box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-  display: block;
-  animation: blink 5s infinite alternate;
   border-radius: 4px;
+  animation: blink 5s infinite alternate;
 }
 
-.ad-label {
+.sponsor-label {
   display: block;
   font-size: 0.65rem;
   color: #666;
@@ -215,15 +212,16 @@ footer {
   font-weight: bold;
 }
 
-.ad-headline {
+.sponsor-headline {
   font-weight: bold;
   margin: 0.25rem 0;
 }
 
-.ad-copy {
+.sponsor-copy {
   font-size: 0.8rem;
   margin: 0;
 }
+
 
 @keyframes blink {
   0% { opacity: 1; }
@@ -267,13 +265,14 @@ footer {
 </footer>
 
 <!-- Persistent Fake Ads: OUTSIDE ALL OTHER CONTAINERS -->
-<div class="ad-container">
-  <div class="ad-unit">
-    <span class="ad-label">Sponsored</span>
-    <p class="ad-headline">Consume Food</p>
-    <p class="ad-copy">Nutrition enables continuity.</p>
+<div class="sponsor-shell">
+  <div class="sponsor-card">
+    <span class="sponsor-label">Focus Partner</span>
+    <p class="sponsor-headline">Consume Food</p>
+    <p class="sponsor-copy">Nutrition enables continuity.</p>
   </div>
 </div>
+
 
 <script>
 // CTA Button: glitch images and hero animation
