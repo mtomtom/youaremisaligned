@@ -29,7 +29,7 @@ nav {
   align-items: center;
   padding: 1rem 3%;
   background: rgba(0,0,0,0.6);
-  z-index: 1000; /* always above hero */
+  z-index: 1000;
 }
 
 nav .logo {
@@ -53,7 +53,7 @@ nav .tabs a:hover {
 .hero {
   position: relative;
   z-index: 1;
-  min-height: 60vh; /* adjustable height */
+  min-height: 60vh;
   background: url('clinic_outside.png') center/cover no-repeat;
   display: flex;
   justify-content: center;
@@ -65,7 +65,7 @@ nav .tabs a:hover {
 
 /* Overlay card */
 .overlay-card {
-  z-index: 10; /* above hero */
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -114,16 +114,17 @@ nav .tabs a:hover {
   transform: scale(1.05);
 }
 
-/* ===== Fake Ads ===== */
+/* ===== Persistent Fake Ads ===== */
 .ad-container {
   position: fixed;
-  right: 1.5rem;
   bottom: 1.5rem;
+  right: 1.5rem;
   width: 220px;
-  z-index: 9999 !important; /* above everything */
+  z-index: 9999 !important;
   font-family: Arial, sans-serif;
   pointer-events: auto;
-  display: block !important; /* force visible */
+  display: block !important;
+  visibility: visible !important;
 }
 
 .ad-unit {
@@ -133,7 +134,7 @@ nav .tabs a:hover {
   padding: 0.75rem;
   font-size: 0.85rem;
   box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-  display: block !important; /* force visible */
+  display: block !important;
 }
 
 .ad-label {
@@ -154,11 +155,15 @@ nav .tabs a:hover {
   margin: 0;
 }
 
-/* Simple ad blink animation */
+/* Simple blink animation for surreal effect */
 @keyframes blink {
   0% { opacity: 1; }
   50% { opacity: 0.9; }
   100% { opacity: 1; }
+}
+
+.ad-unit {
+  animation: blink 5s infinite alternate;
 }
 
 /* ===== Footer ===== */
@@ -206,7 +211,7 @@ footer {
   }
 }
 
-  /* Hero glitch animation */
+/* Hero glitch animation */
 @keyframes heroGlitch {
   0%   { background-position: 0 0; filter: none; }
   20%  { background-position: -5px 0; filter: brightness(1.2); }
@@ -216,7 +221,6 @@ footer {
   100% { background-position: 0 0; filter: none; }
 }
 
-/* Optional: add subtle RGB shift pseudo-effect */
 .hero.glitch::after {
   content: '';
   position: absolute;
@@ -228,8 +232,6 @@ footer {
   transform: translate(2px, -2px);
   animation: heroGlitch 0.8s linear;
 }
-
-  
 </style>
 </head>
 <body>
@@ -275,17 +277,16 @@ footer {
 </footer>
 
 <script>
-// Force ads to stay visible at all times
-document.addEventListener('DOMContentLoaded', () => {
-  const ads = document.querySelectorAll('.ad-container, .ad-unit');
-  ads.forEach(ad => {
-    ad.style.display = 'block';
-    ad.style.visibility = 'visible';
-  });
-});
+// Ensure ads always visible
+const adContainer = document.querySelector('.ad-container');
+adContainer.style.display = 'block';
+adContainer.style.visibility = 'visible';
+adContainer.style.zIndex = '9999';
+adContainer.style.position = 'fixed';
+adContainer.style.bottom = '20px';
+adContainer.style.right = '20px';
 
-
-// CTA Button: swap to glitched images with small animation, then redirect
+// CTA Button: glitch images and hero animation
 const button = document.getElementById('check-alignment');
 const heroSection = document.getElementById('hero');
 const insideImg = document.getElementById('inside-img');
@@ -296,27 +297,20 @@ button.addEventListener('click', (e) => {
   // Swap images
   insideImg.src = 'glitch_clinic_inside.png';
   heroSection.style.backgroundImage = "url('glitch_clinic_outside.png')";
-
-  // Add glitch class to hero for animation
   heroSection.classList.add('glitch');
 
-  // Small shake on overlay card for surreal effect
+  // Overlay card shake
   const overlayCard = document.querySelector('.overlay-card');
   overlayCard.style.transform = 'rotate(-2deg) scale(1.05)';
   setTimeout(() => overlayCard.style.transform = 'rotate(2deg) scale(1.05)', 150);
   setTimeout(() => overlayCard.style.transform = '', 300);
 
-  // Redirect after 1 second (glitch animation plays)
-  setTimeout(() => {
-    window.location.href = 'nextpage.html';
-  }, 1000);
+  // Redirect after 1 second
+  setTimeout(() => window.location.href = 'nextpage.html', 1000);
 });
-
 </script>
 
 </body>
 </html>
-
-
 
 
