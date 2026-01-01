@@ -17,6 +17,10 @@ body, html {
   background: #111;
   scroll-behavior: smooth;
 }
+  *, *::before, *::after {
+  box-sizing: border-box;
+}
+
 
 /* ===== Top Navigation ===== */
 nav {
@@ -70,7 +74,7 @@ nav .tabs a:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 70%;
+  width: min(90%, 560px);
   max-width: 600px;
   padding: 2rem;
   background: rgba(255,255,255,1);
@@ -98,8 +102,10 @@ nav .tabs a:hover {
 }
 
 .cta-button {
+  align-self: flex-start;
+  width: fit-content;
+  padding: 0.75rem 1.4rem;
   display: inline-block;
-  padding: 0.8rem 2rem;
   background-color: #0077cc;
   color: #fff;
   text-decoration: none;
