@@ -61,6 +61,7 @@ nav .tabs a:hover {
   padding-top: 6rem;
   padding-bottom: 3rem;
   transition: background 0.5s ease;
+  overflow: hidden;
 }
 
 /* Overlay card */
@@ -116,15 +117,15 @@ nav .tabs a:hover {
 
 /* ===== Persistent Fake Ads ===== */
 .ad-container {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  width: 220px;
-  z-index: 9999 !important;
-  font-family: Arial, sans-serif;
-  pointer-events: auto;
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  width: 220px !important;
+  z-index: 99999 !important;
   display: block !important;
   visibility: visible !important;
+  pointer-events: auto !important;
+  font-family: Arial, sans-serif;
 }
 
 .ad-unit {
@@ -278,13 +279,15 @@ footer {
 
 <script>
 // Ensure ads always visible
-const adContainer = document.querySelector('.ad-container');
-adContainer.style.display = 'block';
-adContainer.style.visibility = 'visible';
-adContainer.style.zIndex = '9999';
-adContainer.style.position = 'fixed';
-adContainer.style.bottom = '20px';
-adContainer.style.right = '20px';
+document.addEventListener('DOMContentLoaded', () => {
+  const adContainer = document.querySelector('.ad-container');
+  adContainer.style.display = 'block';
+  adContainer.style.visibility = 'visible';
+  adContainer.style.zIndex = '99999';
+  adContainer.style.position = 'fixed';
+  adContainer.style.bottom = '20px';
+  adContainer.style.right = '20px';
+});
 
 // CTA Button: glitch images and hero animation
 const button = document.getElementById('check-alignment');
@@ -312,5 +315,6 @@ button.addEventListener('click', (e) => {
 
 </body>
 </html>
+
 
 
