@@ -4,171 +4,126 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Focus Room</title>
+
 <style>
-  body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    height: 100%;
-    color: #fff;
-  }
-  body {
-    padding-top: 5rem;   /* adjust value */
-}
-
-  /* Top navigation bar */
-  nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 3%;
-    width: 94%;
-    z-index: 10;
-    background: rgba(0,0,0,0.5); /* semi-transparent to overlay background */
-  }
-
-  nav .logo {
-    font-size: 1.8rem;
-    font-weight: bold;
-  }
-
-  nav .tabs a {
-    color: #fff;
-    text-decoration: none;
-    margin-left: 2rem;
-    font-weight: 500;
-    transition: color 0.3s;
-  }
-
-  nav .tabs a:hover {
-    color: #00aced;
-  }
-
-  /* Hero section with background image */
-  .hero {
-    position: relative;
-    z-index: 1;
-    min-height: 55vh;
-    background: url('clinic_outside.png') center/cover no-repeat;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-top: 6rem;
-    padding-bottom: 3rem;
-  }
-
-  .overlay-card {
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 70%;
-    max-width: 600px;
-    padding: 2rem;
-    background: rgba(255,255,255,1);
-    border-radius: 10px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    color: #222;
-    margin-top: 16rem;
-}
-
-/* Left side: image takes ~50% */
-.overlay-card img {
-    width: 40%;      /* roughly half */
-    height: auto;
-    border-radius: 5px;
-}
-
-/* Right side: text and button take ~50% */
-.text-content {
-    width: 40%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-/* Optional: center CTA under text */
-.overlay-card .cta-button {
-    margin-top: 1.5rem;
-    align-self: flex-start; /* left-aligned; change to center if desired */
-}
-
-/* Mobile fallback: stack vertically */
-@media (max-width: 600px) {
-  
-    .overlay-card {
-        flex-direction: column;
-        text-align: center;
-    }
-    .overlay-card img, .overlay-card > div {
-        width: 100%;
-    }
-    .overlay-card .cta-button {
-        align-self: center;
-    }
-}
-
-  .cta-button {
-    display: inline-block;
-    padding: 0.8rem 2rem;
-    background-color: #0077cc;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 5px;
-    margin-top: 1rem;
-    font-weight: 500;
-    transition: background 0.3s;
-  }
-
-  .cta-button:hover {
-    background-color: #005fa3;
-  }
-
-  /* Footer */
-  footer {
-    text-align: center;
-    padding: 2rem;
-    background: #111;
-    color: #ccc;
-  }
-
-  @media (max-width: 600px) {
-    nav {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    nav .tabs {
-      margin-top: 0.5rem;
-    }
-  }
-
-  .social-links {
-  margin-top: 1rem;
-}
-
-.social-links a {
-  color: #aaa;
-  margin: 0 0.8rem;
-  font-size: 0.85rem;
-  text-decoration: none;
-}
-
-.social-links a:hover {
+/* ===== Global Styles ===== */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  height: 100%;
   color: #fff;
+  overflow-x: hidden;
+  background: #111;
+  scroll-behavior: smooth;
 }
 
-  /* Fake ads */
+/* ===== Top Navigation ===== */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 3%;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000; /* always above hero */
+}
 
+nav .logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+nav .tabs a {
+  color: #fff;
+  text-decoration: none;
+  margin-left: 2rem;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+nav .tabs a:hover {
+  color: #00aced;
+}
+
+/* ===== Hero Section ===== */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 60vh; /* adjustable height */
+  background: url('clinic_outside.png') center/cover no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 6rem;
+  padding-bottom: 3rem;
+  transition: background 0.5s ease;
+}
+
+/* Overlay card */
+.overlay-card {
+  z-index: 10; /* above hero */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 70%;
+  max-width: 600px;
+  padding: 2rem;
+  background: rgba(255,255,255,1);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  color: #222;
+  margin-top: 6rem;
+  flex-wrap: wrap;
+  transition: transform 0.3s ease;
+}
+
+.overlay-card img {
+  width: 40%;
+  height: auto;
+  border-radius: 5px;
+  transition: transform 0.3s ease;
+}
+
+.text-content {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 1rem;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  background-color: #0077cc;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  margin-top: 1rem;
+  font-weight: 500;
+  transition: background 0.3s, transform 0.15s;
+  cursor: pointer;
+}
+
+.cta-button:hover {
+  background-color: #005fa3;
+  transform: scale(1.05);
+}
+
+/* ===== Fake Ads ===== */
 .ad-container {
   position: fixed;
   right: 1.5rem;
   bottom: 1.5rem;
   width: 220px;
-  z-index: 9999; /* ensure it floats above everything */
+  z-index: 9999; /* floats above everything */
   font-family: Arial, sans-serif;
   pointer-events: auto;
 }
-
 
 .ad-unit {
   background: #f1f1f1;
@@ -177,6 +132,7 @@
   padding: 0.75rem;
   font-size: 0.85rem;
   box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  animation: blink 5s infinite alternate;
 }
 
 .ad-label {
@@ -197,7 +153,82 @@
   margin: 0;
 }
 
+/* Simple ad blink animation */
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
 
+/* ===== Footer ===== */
+footer {
+  text-align: center;
+  padding: 2rem;
+  background: #111;
+  color: #ccc;
+}
+
+.social-links {
+  margin-top: 1rem;
+}
+
+.social-links a {
+  color: #aaa;
+  margin: 0 0.8rem;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.social-links a:hover {
+  color: #fff;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  nav .tabs {
+    margin-top: 0.5rem;
+  }
+  .overlay-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  .overlay-card img, .text-content {
+    width: 100%;
+    padding-left: 0;
+  }
+  .cta-button {
+    align-self: center;
+  }
+}
+
+  /* Hero glitch animation */
+@keyframes heroGlitch {
+  0%   { background-position: 0 0; filter: none; }
+  20%  { background-position: -5px 0; filter: brightness(1.2); }
+  40%  { background-position: 5px -5px; filter: contrast(1.5) hue-rotate(20deg); }
+  60%  { background-position: -3px 3px; filter: brightness(0.9) hue-rotate(-10deg); }
+  80%  { background-position: 2px -2px; filter: contrast(1.2) saturate(1.5); }
+  100% { background-position: 0 0; filter: none; }
+}
+
+/* Optional: add subtle RGB shift pseudo-effect */
+.hero.glitch::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: inherit;
+  mix-blend-mode: screen;
+  opacity: 0.3;
+  transform: translate(2px, -2px);
+  animation: heroGlitch 0.8s linear;
+}
+
+  
 </style>
 </head>
 <body>
@@ -216,9 +247,7 @@
 <!-- Hero Section -->
 <section class="hero" id="hero">
   <div class="overlay-card">
-    <!-- Only the inside image in the card -->
     <img id="inside-img" src="clinic_inside.png" alt="Inside the clinic">
-
     <div class="text-content">
       <p>Professional assessment and subtle focus experiences await you.</p>
       <a href="#" id="check-alignment" class="cta-button">Check Alignment</a>
@@ -226,28 +255,7 @@
   </div>
 </section>
 
-
-<script>
-const button = document.getElementById('check-alignment');
-const heroSection = document.getElementById('hero');
-const insideImg = document.getElementById('inside-img');
-
-button.addEventListener('click', (e) => {
-  e.preventDefault();
-
-  // Swap inside image
-  insideImg.src = 'glitch_clinic_inside.png';
-
-  // Swap hero background image
-  heroSection.style.backgroundImage = "url('glitch_clinic_outside.png')";
-
-  // After 1 second, move to next page
-  setTimeout(() => {
-    window.location.href = 'nextpage.html';
-  }, 1000);
-});
-</script>
-
+<!-- Persistent Fake Ads -->
 <div class="ad-container">
   <div class="ad-unit">
     <span class="ad-label">Sponsored</span>
@@ -256,16 +264,50 @@ button.addEventListener('click', (e) => {
   </div>
 </div>
 
-
+<!-- Footer -->
 <footer>
   <p>&copy; 2025 The Focus Room. All rights reserved.</p>
-
   <div class="social-links">
     <a href="https://tiktok.com/@thefocusroom01" target="_blank">TikTok</a>
     <a href="https://youtube.com/@thefocusroom01" target="_blank">YouTube</a>
   </div>
 </footer>
 
+<script>
+// Ensure ads stay visible
+document.addEventListener('DOMContentLoaded', () => {
+  const ads = document.querySelectorAll('.ad-container, .ad-unit');
+  ads.forEach(ad => ad.style.display = 'block');
+});
+
+// CTA Button: swap to glitched images with small animation, then redirect
+const button = document.getElementById('check-alignment');
+const heroSection = document.getElementById('hero');
+const insideImg = document.getElementById('inside-img');
+
+button.addEventListener('click', (e) => {
+  e.preventDefault();
+
+  // Swap images
+  insideImg.src = 'glitch_clinic_inside.png';
+  heroSection.style.backgroundImage = "url('glitch_clinic_outside.png')";
+
+  // Add glitch class to hero for animation
+  heroSection.classList.add('glitch');
+
+  // Small shake on overlay card for surreal effect
+  const overlayCard = document.querySelector('.overlay-card');
+  overlayCard.style.transform = 'rotate(-2deg) scale(1.05)';
+  setTimeout(() => overlayCard.style.transform = 'rotate(2deg) scale(1.05)', 150);
+  setTimeout(() => overlayCard.style.transform = '', 300);
+
+  // Redirect after 1 second (glitch animation plays)
+  setTimeout(() => {
+    window.location.href = 'nextpage.html';
+  }, 1000);
+});
+
+</script>
 
 </body>
 </html>
