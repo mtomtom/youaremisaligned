@@ -2,38 +2,307 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Ad Test</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Focus Room</title>
+
 <style>
-body { margin:0; padding:0; height:200vh; background:#111; color:#fff; }
+/* ===== Global Styles ===== */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  height: 100%;
+  color: #fff;
+  overflow-x: hidden;
+  background: #111;
+  scroll-behavior: smooth;
+}
 
-.hero { height:100vh; background: url('clinic_outside.png') center/cover no-repeat; }
+/* ===== Top Navigation ===== */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 3%;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+}
 
+nav .logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+nav .tabs a {
+  color: #fff;
+  text-decoration: none;
+  margin-left: 2rem;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+nav .tabs a:hover {
+  color: #00aced;
+}
+
+/* ===== Hero Section ===== */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 60vh;
+  background: url('clinic_outside.png') center/cover no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 6rem;
+  padding-bottom: 3rem;
+  transition: background 0.5s ease;
+  overflow: hidden;
+}
+
+/* Overlay card */
+.overlay-card {
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 70%;
+  max-width: 600px;
+  padding: 2rem;
+  background: rgba(255,255,255,1);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  color: #222;
+  margin-top: 6rem;
+  flex-wrap: wrap;
+  transition: transform 0.3s ease;
+}
+
+.overlay-card img {
+  width: 40%;
+  height: auto;
+  border-radius: 5px;
+  transition: transform 0.3s ease;
+}
+
+.text-content {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 1rem;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  background-color: #0077cc;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  margin-top: 1rem;
+  font-weight: 500;
+  transition: background 0.3s, transform 0.15s;
+  cursor: pointer;
+}
+
+.cta-button:hover {
+  background-color: #005fa3;
+  transform: scale(1.05);
+}
+
+/* ===== Footer ===== */
+footer {
+  text-align: center;
+  padding: 2rem;
+  background: #111;
+  color: #ccc;
+}
+
+.social-links {
+  margin-top: 1rem;
+}
+
+.social-links a {
+  color: #aaa;
+  margin: 0 0.8rem;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.social-links a:hover {
+  color: #fff;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  nav .tabs {
+    margin-top: 0.5rem;
+  }
+  .overlay-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  .overlay-card img, .text-content {
+    width: 100%;
+    padding-left: 0;
+  }
+  .cta-button {
+    align-self: center;
+  }
+}
+
+/* Hero glitch animation */
+@keyframes heroGlitch {
+  0%   { background-position: 0 0; filter: none; }
+  20%  { background-position: -5px 0; filter: brightness(1.2); }
+  40%  { background-position: 5px -5px; filter: contrast(1.5) hue-rotate(20deg); }
+  60%  { background-position: -3px 3px; filter: brightness(0.9) hue-rotate(-10deg); }
+  80%  { background-position: 2px -2px; filter: contrast(1.2) saturate(1.5); }
+  100% { background-position: 0 0; filter: none; }
+}
+
+.hero.glitch::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: inherit;
+  mix-blend-mode: screen;
+  opacity: 0.3;
+  transform: translate(2px, -2px);
+  animation: heroGlitch 0.8s linear;
+}
+
+/* ===== Persistent Fake Ads ===== */
 .ad-container {
   position: fixed;
   bottom: 20px;
   right: 20px;
   width: 220px;
   z-index: 99999;
+  font-family: 'Comic Neue', Arial, sans-serif;
+  display: block;
+  pointer-events: auto;
+}
+
+.ad-unit {
   background: #f1f1f1;
   color: #111;
   border: 1px solid #ccc;
   padding: 0.75rem;
-  font-family: Arial, sans-serif;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  display: block;
+  animation: blink 5s infinite alternate;
+  border-radius: 4px;
 }
+
+.ad-label {
+  display: block;
+  font-size: 0.65rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.ad-headline {
+  font-weight: bold;
+  margin: 0.25rem 0;
+}
+
+.ad-copy {
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.9; }
+  100% { opacity: 1; }
+}
+
 </style>
 </head>
 <body>
 
-<div class="hero"></div>
+<!-- Navigation -->
+<nav>
+  <div class="logo">The Focus Room</div>
+  <div class="tabs">
+    <a href="#">Home</a>
+    <a href="#">Sessions</a>
+    <a href="#">About</a>
+    <a href="#">Contact</a>
+  </div>
+</nav>
 
+<!-- Hero Section -->
+<section class="hero" id="hero">
+  <div class="overlay-card">
+    <img id="inside-img" src="clinic_inside.png" alt="Inside the clinic">
+    <div class="text-content">
+      <p>Professional assessment and subtle focus experiences await you.</p>
+      <a href="#" id="check-alignment" class="cta-button">Check Alignment</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>&copy; 2025 The Focus Room. All rights reserved.</p>
+  <div class="social-links">
+    <a href="https://tiktok.com/@thefocusroom01" target="_blank">TikTok</a>
+    <a href="https://youtube.com/@thefocusroom01" target="_blank">YouTube</a>
+  </div>
+</footer>
+
+<!-- Persistent Fake Ads: OUTSIDE ALL OTHER CONTAINERS -->
 <div class="ad-container">
-  <strong>Sponsored</strong><br>
-  Consume Food<br>
-  Nutrition enables continuity.
+  <div class="ad-unit">
+    <span class="ad-label">Sponsored</span>
+    <p class="ad-headline">Consume Food</p>
+    <p class="ad-copy">Nutrition enables continuity.</p>
+  </div>
 </div>
+
+<script>
+// CTA Button: glitch images and hero animation
+const button = document.getElementById('check-alignment');
+const heroSection = document.getElementById('hero');
+const insideImg = document.getElementById('inside-img');
+
+button.addEventListener('click', (e) => {
+  e.preventDefault();
+
+  // Swap images
+  insideImg.src = 'glitch_clinic_inside.png';
+  heroSection.style.backgroundImage = "url('glitch_clinic_outside.png')";
+  heroSection.classList.add('glitch');
+
+  // Overlay card shake
+  const overlayCard = document.querySelector('.overlay-card');
+  overlayCard.style.transform = 'rotate(-2deg) scale(1.05)';
+  setTimeout(() => overlayCard.style.transform = 'rotate(2deg) scale(1.05)', 150);
+  setTimeout(() => overlayCard.style.transform = '', 300);
+
+  // Redirect after 1 second
+  setTimeout(() => window.location.href = 'nextpage.html', 1000);
+});
+</script>
 
 </body>
 </html>
+
 
 
 
