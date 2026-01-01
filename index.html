@@ -61,7 +61,6 @@ nav .tabs a:hover {
   padding-top: 6rem;
   padding-bottom: 3rem;
   transition: background 0.5s ease;
-  overflow: hidden;
 }
 
 /* Overlay card */
@@ -156,7 +155,7 @@ nav .tabs a:hover {
   margin: 0;
 }
 
-/* Blink animation for surreal effect */
+/* Simple blink animation for surreal effect */
 @keyframes blink {
   0% { opacity: 1; }
   50% { opacity: 0.9; }
@@ -212,8 +211,16 @@ footer {
   }
 }
 
-/* ===== Hero Glitch RGB Animation ===== */
-.hero.glitch::before,
+/* Hero glitch animation */
+@keyframes heroGlitch {
+  0%   { background-position: 0 0; filter: none; }
+  20%  { background-position: -5px 0; filter: brightness(1.2); }
+  40%  { background-position: 5px -5px; filter: contrast(1.5) hue-rotate(20deg); }
+  60%  { background-position: -3px 3px; filter: brightness(0.9) hue-rotate(-10deg); }
+  80%  { background-position: 2px -2px; filter: contrast(1.2) saturate(1.5); }
+  100% { background-position: 0 0; filter: none; }
+}
+
 .hero.glitch::after {
   content: '';
   position: absolute;
@@ -221,29 +228,9 @@ footer {
   width: 100%; height: 100%;
   background: inherit;
   mix-blend-mode: screen;
-  opacity: 0.2;
-  z-index: 5;
-}
-
-.hero.glitch::before {
-  animation: glitchRGB 0.3s infinite;
-  transform: translate(-2px, 0);
-  background-color: red;
-}
-
-.hero.glitch::after {
-  animation: glitchRGB 0.35s infinite;
-  transform: translate(2px, 0);
-  background-color: cyan;
-}
-
-@keyframes glitchRGB {
-  0%   { transform: translate(0,0) }
-  20%  { transform: translate(-3px, 1px) }
-  40%  { transform: translate(2px,-1px) }
-  60%  { transform: translate(-2px,0) }
-  80%  { transform: translate(1px,2px) }
-  100% { transform: translate(0,0) }
+  opacity: 0.3;
+  transform: translate(2px, -2px);
+  animation: heroGlitch 0.8s linear;
 }
 </style>
 </head>
@@ -290,7 +277,7 @@ footer {
 </footer>
 
 <script>
-// Force ads to stay visible
+// Ensure ads always visible
 const adContainer = document.querySelector('.ad-container');
 adContainer.style.display = 'block';
 adContainer.style.visibility = 'visible';
@@ -299,7 +286,7 @@ adContainer.style.position = 'fixed';
 adContainer.style.bottom = '20px';
 adContainer.style.right = '20px';
 
-// CTA Button: glitch hero and overlay card
+// CTA Button: glitch images and hero animation
 const button = document.getElementById('check-alignment');
 const heroSection = document.getElementById('hero');
 const insideImg = document.getElementById('inside-img');
@@ -310,8 +297,6 @@ button.addEventListener('click', (e) => {
   // Swap images
   insideImg.src = 'glitch_clinic_inside.png';
   heroSection.style.backgroundImage = "url('glitch_clinic_outside.png')";
-  
-  // Add RGB glitch class
   heroSection.classList.add('glitch');
 
   // Overlay card shake
@@ -320,11 +305,6 @@ button.addEventListener('click', (e) => {
   setTimeout(() => overlayCard.style.transform = 'rotate(2deg) scale(1.05)', 150);
   setTimeout(() => overlayCard.style.transform = '', 300);
 
-  // Hero small shake
-  heroSection.style.transform = 'scale(1.02)';
-  setTimeout(() => heroSection.style.transform = 'scale(0.98)', 150);
-  setTimeout(() => heroSection.style.transform = '', 300);
-
   // Redirect after 1 second
   setTimeout(() => window.location.href = 'nextpage.html', 1000);
 });
@@ -332,6 +312,5 @@ button.addEventListener('click', (e) => {
 
 </body>
 </html>
-
 
 
