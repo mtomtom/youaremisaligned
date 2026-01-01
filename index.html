@@ -120,9 +120,10 @@ nav .tabs a:hover {
   right: 1.5rem;
   bottom: 1.5rem;
   width: 220px;
-  z-index: 9999; /* floats above everything */
+  z-index: 9999 !important; /* above everything */
   font-family: Arial, sans-serif;
   pointer-events: auto;
+  display: block !important; /* force visible */
 }
 
 .ad-unit {
@@ -132,7 +133,7 @@ nav .tabs a:hover {
   padding: 0.75rem;
   font-size: 0.85rem;
   box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-  animation: blink 5s infinite alternate;
+  display: block !important; /* force visible */
 }
 
 .ad-label {
@@ -274,11 +275,15 @@ footer {
 </footer>
 
 <script>
-// Ensure ads stay visible
+// Force ads to stay visible at all times
 document.addEventListener('DOMContentLoaded', () => {
   const ads = document.querySelectorAll('.ad-container, .ad-unit');
-  ads.forEach(ad => ad.style.display = 'block');
+  ads.forEach(ad => {
+    ad.style.display = 'block';
+    ad.style.visibility = 'visible';
+  });
 });
+
 
 // CTA Button: swap to glitched images with small animation, then redirect
 const button = document.getElementById('check-alignment');
