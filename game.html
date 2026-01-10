@@ -1,108 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>AI Wellness Calibration</title>
-<style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    background: #F2F2F2;
-    font-family: "IBM Plex Sans", sans-serif;
-    overflow: hidden;
-  }
-  canvas {
-    display: block;
-    margin: 0 auto;
-    background: #EDEDED;
-  }
-  #instruction {
-    position: absolute;
-    top: 10%;
-    width: 100%;
-    text-align: center;
-    font-size: 2em;
-    color: #111111;
-  }
-  #feedback {
-    position: absolute;
-    bottom: 10%;
-    width: 100%;
-    text-align: center;
-    font-size: 1.5em;
-    color: #222222;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>The Room</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="instruction">Align posture. Observe time.</div>
-<div id="feedback"></div>
-<canvas id="gameCanvas"></canvas>
+  <div id="container">
+    <canvas id="roomCanvas" width="800" height="600"></canvas>
 
-<script>
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+    <input
+      id="inputBox"
+      type="text"
+      placeholder="type something"
+      autocomplete="off"
+    />
+  </div>
 
-let player = {x: canvas.width/2, y: canvas.height - 100, radius: 15};
-let corridor = {x: canvas.width/2 - 50, width: 100};
-let clock = {seconds: 0};
-let feedback = document.getElementById('feedback');
-let drift = 0;
-
-const keys = {ArrowLeft:false, ArrowRight:false};
-
-window.addEventListener('keydown', e => keys[e.key] = true);
-window.addEventListener('keyup', e => keys[e.key] = false);
-
-function draw() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  // Draw alignment corridor
-  ctx.fillStyle = '#D3D3D3';
-  ctx.fillRect(corridor.x, 0, corridor.width, canvas.height);
-
-  // Draw player
-  ctx.fillStyle = '#111111';
-  ctx.beginPath();
-  ctx.arc(player.x, player.y, player.radius, 0, Math.PI*2);
-  ctx.fill();
-
-  // Draw subtle clock
-  ctx.fillStyle = '#222222';
-  ctx.font = '30px "IBM Plex Sans", sans-serif';
-  ctx.fillText(`Clock: ${clock.seconds}s`, 20, 40);
-}
-
-function update() {
-  // Player movement
-  if(keys.ArrowLeft) player.x -= 3;
-  if(keys.ArrowRight) player.x += 3;
-
-  // Drift corridor slightly for "impossible perfection"
-  drift += (Math.random() - 0.5) * 0.5;
-  corridor.x += drift;
-  if(corridor.x < 50) corridor.x = 50;
-  if(corridor.x + corridor.width > canvas.width - 50) corridor.x = canvas.width - 50 - corridor.width;
-
-  // Update clock (random drift too)
-  clock.seconds += Math.random() < 0.98 ? 0.1 : -0.2;
-
-  // Feedback logic
-  if(player.x < corridor.x || player.x > corridor.x + corridor.width){
-    feedback.textContent = "Misalignment detected.";
-  } else {
-    feedback.textContent = "Endurance is trainable.";
-  }
-
-  draw();
-  requestAnimationFrame(update);
-}
-
-update();
-</script>
+  <script src="main.js"></script>
 </body>
 </html>
+
