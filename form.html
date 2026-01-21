@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimal Self-Actualization Portal</title>
+    <style>
+        :root {
+            --wellness-white: #f9fbfb;
+            --clinical-blue: #d1e3e3;
+            --error-red: #ff4d4d;
+        }
+
+        body {
+            background-color: var(--wellness-white);
+            color: #2c3e50;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 20px;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+
+        h1 { font-weight: 200; letter-spacing: 2px; text-transform: uppercase; }
+        p { font-style: italic; opacity: 0.7; }
+
+        #form-container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.8s ease-out forwards;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #555;
+            transition: all 0.5s ease;
+        }
+
+        input {
+            padding: 15px;
+            border: 1px solid var(--clinical-blue);
+            background: white;
+            border-radius: 4px;
+            outline: none;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            border-color: #a0c4c4;
+            box-shadow: 0 0 15px rgba(209, 227, 227, 0.5);
+        }
+
+        .status-msg {
+            font-size: 0.7rem;
+            margin-top: 5px;
+            color: var(--error-red);
+            height: 15px;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #sentinel { height: 100px; width: 100%; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>The Wellness Protocol</h1>
+    <p>Please provide the required data for your transformation. Do not stop until you are complete.</p>
+</header>
+
+<div id="form-container">
+    </div>
+
+<div id="sentinel"></div>
+
+<script>
+    const container = document.getElementById('form-container');
+    const sentinel = document.getElementById('sentinel');
+    let fieldCount = 0;
+
+    const prompts = {
+        low: ["Full Legal Name", "Email for Soul-Sync", "Residential Geometry", "Preferred Wake-Up Vibration"],
+        medium: ["How many birds did you count today?", "Describe the texture of your regrets", "Which organ feels the quietest?", "Percentage of self currently occupied by water"],
+        high: ["The wall is listening. What does it hear?", "Identify the shape of your ancestor's grief", "Provide the frequency of your internal hum", "If you were a color that didn't exist, what would you be?"],
+        ascended: ["Is the person behind you still there?", "Upload the sound of your last blinking", "Are you sure you are breathing correctly?", "THE VOID REQUIRES DATA."]
+    };
+
+    const statusMessages = [
+        "Analyzing intent...", "Validation successful.", "Syntax: Uncomfortably Organic", 
+        "Warning: Pulse detected in input", "Data tastes... bitter.", "Optimizing your essence..."
+    ];
+
+    function createField() {
+        fieldCount++;
+        let pool;
+        if (fieldCount < 4) pool = prompts.low;
+        else if (fieldCount < 8) pool = prompts.medium;
+        else if (fieldCount < 12) pool = prompts.high;
+        else pool = prompts.ascended;
+
+        const text = pool[Math.floor(Math.random() * pool.length)];
+        
+        const group = document.createElement('div');
+        group.className = 'input-group';
+        
+        const label = document.createElement('label');
+        label.innerText = text;
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = "...";
+
+        const status = document.createElement('div');
+        status.className = 'status-msg';
+
+        // Add subtle uncanny effects as user types
+        input.addEventListener('input', (e) => {
+            if (fieldCount > 8) {
+                const blurVal = e.target.value.length / 5;
+                input.style.filter = `blur(${Math.min(blurVal, 2)}px)`;
+                label.style.letterSpacing = `${e.target.value.length}px`;
+            }
+            
+            if (Math.random() > 0.8) {
+                status.innerText = statusMessages[Math.floor(Math.random() * statusMessages.length)];
+                status.style.opacity = 1;
+                setTimeout(() => { status.style.opacity = 0; }, 2000);
+            }
+        });
+
+        group.appendChild(label);
+        group.appendChild(input);
+        group.appendChild(status);
+        container.appendChild(group);
+
+        // Auto-focus logic for the "never ending" feel
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                // If there's a next input, focus it; otherwise, the observer will handle it
+                const next = group.nextElementSibling?.querySelector('input');
+                if (next) next.focus();
+            }
+        });
+    }
+
+    // Intersection Observer to detect when user reaches the bottom
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+            // Generate 3 new fields every time we reach the bottom
+            for(let i=0; i<3; i++) {
+                createField();
+            }
+        }
+    }, { threshold: 1.0 });
+
+    observer.observe(sentinel);
+
+    // Initial fields
+    for(let i=0; i<4; i++) createField();
+
+</script>
+</body>
+</html>
