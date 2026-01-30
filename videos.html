@@ -183,10 +183,10 @@
 </header>
 
 <div class="monitor-grid">
-    <div class="feed">
+    <div class="feed" id="random-feed" style="cursor: crosshair;">
         <div class="rec-dot"></div>
         <div class="fuzzy-overlay"></div>
-        <img src="images/room1.png" class="surveillance-img" alt="Subject Log 01">
+        <img src="images/room1.png" id="active-surveillance" class="surveillance-img" alt="Subject Log 01">
     </div>
 
     <div class="feed">
@@ -194,9 +194,8 @@
         <div class="fuzzy-overlay"></div>
         <img src="images/room2.png" class="surveillance-img" alt="Subject Log 02">
     </div>
-
-    </div>
-
+</div>
+    
 <div id="agent-chat">
     <span class="agent-name">SYS_MONITOR // AGENT_73</span>
     <div id="chat-log">Initializing connection...<br></div>
@@ -240,16 +239,16 @@
 
     // List all your filenames here
 const imagePool = [
-    'images/room1.jpg',
-    'images/room2.jpg',
-    'images/room3.jpg',
-    'images/room4.jpg',
-    'images/room5.jpg',
-    'images/room6.jpg',
-    'images/room7.jpg',
-    'images/room8.jpg',
-    'images/room9.jpg',
-    'images/room10.jpg'
+    'images/room1.png',
+    'images/room2.png',
+    'images/room3.png',
+    'images/room4.png',
+    'images/room5.png',
+    'images/room6.png',
+    'images/room7.png',
+    'images/room8.png',
+    'images/room9.png',
+    'images/room10.png'
     
 ];
 
