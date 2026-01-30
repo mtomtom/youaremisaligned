@@ -238,19 +238,49 @@
     // Start the agent messages after 4 seconds
     setTimeout(addMessage, 4000);
 
-    document.querySelectorAll('.feed').forEach(feed => {
-    feed.addEventListener('click', function() {
-        const img = this.querySelector('.surveillance-img');
+    // List all your filenames here
+const imagePool = [
+    'images/room1.jpg',
+    'images/room2.jpg',
+    'images/room3.jpg',
+    'images/room4.jpg',
+    'images/room5.jpg',
+    'images/room6.jpg',
+    'images/room7.jpg',
+    'images/room8.jpg',
+    'images/room9.jpg',
+    'images/room10.jpg'
+    
+];
+
+const feedContainer = document.getElementById('random-feed');
+const displayImg = document.getElementById('active-surveillance');
+
+feedContainer.addEventListener('click', () => {
+    // 1. Add a heavy glitch effect during the "swap"
+    displayImg.style.filter = "invert(100%) contrast(500%) blur(20px)";
+    feedContainer.style.backgroundColor = "#fff"; // Flash of white
+
+    // 2. Choose a random image that isn't the current one
+    let newIndex;
+    do {
+        newIndex = Math.floor(Math.random() * imagePool.length);
+    } while (imagePool[newIndex] === displayImg.getAttribute('src'));
+
+    // 3. Swap the image after a tiny delay (the "glitch" duration)
+    setTimeout(() => {
+        displayImg.src = imagePool[newIndex];
         
-        // Brief glitch effect
-        img.style.filter = "grayscale(100%) contrast(300%) blur(10px)";
-        this.style.transform = `translate(${Math.random()*10}px, ${Math.random()*10}px)`;
+        // 4. Return to normal surveillance style
+        displayImg.style.filter = "grayscale(100%) contrast(150%) brightness(0.7) blur(0.5px)";
+        feedContainer.style.backgroundColor = "#000";
         
-        setTimeout(() => {
-            img.style.filter = "grayscale(100%) contrast(150%) brightness(0.7) blur(0.5px)";
-            this.style.transform = "translate(0,0)";
-        }, 200);
-    });
+        // 5. Send a chat message about the swap
+        const log = document.getElementById('chat-log');
+        const entry = document.createElement('div');
+        entry.innerHTML = `> <span style="color:red;">WARNING:</span> Archive jump detected. File: ${imagePool[newIndex]}`;
+        log.appendChild(entry);
+    }, 150);
 });
 </script>
 
