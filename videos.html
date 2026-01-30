@@ -183,16 +183,16 @@
 </header>
 
 <div class="monitor-grid">
-    <div class="feed" id="random-feed" style="cursor: crosshair;">
+    <div class="feed image-feed">
         <div class="rec-dot"></div>
         <div class="fuzzy-overlay"></div>
-        <img src="images/room1.png" id="active-surveillance" class="surveillance-img" alt="Subject Log 01">
+        <img src="images/room1.png" class="surveillance-img">
     </div>
 
-    <div class="feed">
+    <div class="feed image-feed">
         <div class="rec-dot"></div>
         <div class="fuzzy-overlay"></div>
-        <img src="images/room2.png" class="surveillance-img" alt="Subject Log 02">
+        <img src="images/room2.png" class="surveillance-img">
     </div>
 </div>
     
@@ -255,31 +255,35 @@ const imagePool = [
 const feedContainer = document.getElementById('random-feed');
 const displayImg = document.getElementById('active-surveillance');
 
-feedContainer.addEventListener('click', () => {
-    // 1. Add a heavy glitch effect during the "swap"
-    displayImg.style.filter = "invert(100%) contrast(500%) blur(20px)";
-    feedContainer.style.backgroundColor = "#fff"; // Flash of white
+// This selects ALL feeds with the class "image-feed"
+const allImageFeeds = document.querySelectorAll('.image-feed');
 
-    // 2. Choose a random image that isn't the current one
-    let newIndex;
-    do {
-        newIndex = Math.floor(Math.random() * imagePool.length);
-    } while (imagePool[newIndex] === displayImg.getAttribute('src'));
+allImageFeeds.forEach(feed => {
+    feed.addEventListener('click', () => {
+        const img = feed.querySelector('.surveillance-img');
+        
+        // 1. Glitch Effect
+        img.style.filter = "invert(100%) contrast(500%) blur(20px)";
+        feed.style.backgroundColor = "#fff";
 
-    // 3. Swap the image after a tiny delay (the "glitch" duration)
-    setTimeout(() => {
-        displayImg.src = imagePool[newIndex];
+        // 2. Random Swap
+        let newIndex = Math.floor(Math.random() * imagePool.length);
         
-        // 4. Return to normal surveillance style
-        displayImg.style.filter = "grayscale(100%) contrast(150%) brightness(0.7) blur(0.5px)";
-        feedContainer.style.backgroundColor = "#000";
-        
-        // 5. Send a chat message about the swap
-        const log = document.getElementById('chat-log');
-        const entry = document.createElement('div');
-        entry.innerHTML = `> <span style="color:red;">WARNING:</span> Archive jump detected. File: ${imagePool[newIndex]}`;
-        log.appendChild(entry);
-    }, 150);
+        setTimeout(() => {
+            img.src = imagePool[newIndex];
+            
+            // 3. Reset Styles
+            img.style.filter = "grayscale(100%) contrast(150%) brightness(0.7) blur(0.5px)";
+            feed.style.backgroundColor = "#000";
+            
+            // 4. Update the Agent Chat
+            const log = document.getElementById('chat-log');
+            const entry = document.createElement('div');
+            entry.innerHTML = `> <span style="color:red;">INTERCEPT:</span> Switching feed to ${imagePool[newIndex]}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }, 150);
+    });
 });
 </script>
 
