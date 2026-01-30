@@ -119,6 +119,60 @@
         @keyframes blink {
             0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; }
         }
+
+        /* Style for the images to match the videos */
+.surveillance-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: grayscale(100%) contrast(150%) brightness(0.7) blur(0.5px);
+}
+
+/* The "Fuzzy" Static Effect */
+.fuzzy-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none; /* Allows you to click 'through' the fuzz */
+    opacity: 0.15;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Resolution_White_Noise.png');
+    animation: noise 0.2s infinite;
+}
+
+/* Scanlines Effect */
+.feed::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.1) 50%
+    );
+    background-size: 100% 4px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Noise Animation */
+@keyframes noise {
+    0% { transform: translate(0,0) }
+    10% { transform: translate(-5%,-5%) }
+    20% { transform: translate(-10%,5%) }
+    30% { transform: translate(5%,-10%) }
+    40% { transform: translate(-5%,15%) }
+    50% { transform: translate(-10%,5%) }
+    60% { transform: translate(15%,0) }
+    70% { transform: translate(0,10%) }
+    80% { transform: translate(-15%,0) }
+    90% { transform: translate(10%,5%) }
+    100% { transform: translate(5%,0) }
+}
     </style>
 </head>
 <body>
@@ -131,13 +185,17 @@
 <div class="monitor-grid">
     <div class="feed">
         <div class="rec-dot"></div>
-        <video src="eye-smile.mp4" autoplay loop muted playsinline></video>
+        <div class="fuzzy-overlay"></div>
+        <img src="images/room1.png" class="surveillance-img" alt="Subject Log 01">
     </div>
+
     <div class="feed">
         <div class="rec-dot"></div>
-        <video src="mirror-gaze.mp4" autoplay loop muted playsinline></video>
+        <div class="fuzzy-overlay"></div>
+        <img src="images/room2.png" class="surveillance-img" alt="Subject Log 02">
     </div>
-</div>
+
+    </div>
 
 <div id="agent-chat">
     <span class="agent-name">SYS_MONITOR // AGENT_73</span>
@@ -179,6 +237,21 @@
 
     // Start the agent messages after 4 seconds
     setTimeout(addMessage, 4000);
+
+    document.querySelectorAll('.feed').forEach(feed => {
+    feed.addEventListener('click', function() {
+        const img = this.querySelector('.surveillance-img');
+        
+        // Brief glitch effect
+        img.style.filter = "grayscale(100%) contrast(300%) blur(10px)";
+        this.style.transform = `translate(${Math.random()*10}px, ${Math.random()*10}px)`;
+        
+        setTimeout(() => {
+            img.style.filter = "grayscale(100%) contrast(150%) brightness(0.7) blur(0.5px)";
+            this.style.transform = "translate(0,0)";
+        }, 200);
+    });
+});
 </script>
 
 </body>
