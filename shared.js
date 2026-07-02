@@ -75,19 +75,48 @@
 
   // ========== Return Visitor Banner ==========
   function showReturnBanner(visitCount) {
-    const messages = [
-      'Welcome back. You\'ve been here before.',
-      'We remembered you. Interesting.',
-      'Session ' + visitCount + '. The room notices patterns.',
-      'Return visit logged. Your alignment is shifting.',
-      'The Focus Room has missed your data.'
-    ];
-    const msg = messages[Math.min(visitCount - 1, messages.length - 1)];
+    const now = new Date();
+    const lastVisit = progress.lastVisited ? new Date(progress.lastVisited) : null;
+    let timeSinceMessage = '';
+
+    if (lastVisit && !isNaN(lastVisit.getTime())) {
+      const hoursSince = (now - lastVisit) / (1000 * 60 * 60);
+      if (hoursSince < 24) {
+        const minsSince = Math.round(hoursSince * 60);
+        if (minsSince < 1) {
+          timeSinceMessage = ' You returned before the last session finished loading.';
+        } else if (minsSince < 60) {
+          timeSinceMessage = ' You\'re back already. The room was just starting to miss your data.';
+        } else {
+          timeSinceMessage = ' ' + Math.round(hoursSince * 10) / 10 + ' hours since last visit. The room kept your chair warm.';
+        }
+      }
+    }
+
+    let msg;
+    if (visitCount === 2) {
+      msg = 'We remembered you.' + timeSinceMessage;
+    } else if (visitCount === 3) {
+      msg = 'You keep coming back. The room likes that.' + timeSinceMessage;
+    } else if (visitCount >= 4) {
+      msg = 'Session ████. Your alignment is... shifting. We can feel it.' + timeSinceMessage;
+    } else {
+      // Fallback for any count
+      const fallbacks = [
+        'Welcome back. You\'ve been here before.',
+        'We remembered you. Interesting.',
+        'Session ' + visitCount + '. The room notices patterns.',
+        'Return visit logged. Your alignment is shifting.',
+        'The Focus Room has missed your data.'
+      ];
+      msg = fallbacks[Math.min(visitCount - 1, fallbacks.length - 1)] + timeSinceMessage;
+    }
+
     const banner = document.createElement('div');
     banner.className = 'return-banner';
     banner.textContent = msg;
     document.body.appendChild(banner);
-    setTimeout(() => banner.remove(), 4500);
+    setTimeout(() => banner.remove(), 5500);
   }
 
   // ========== Audio Manager ==========

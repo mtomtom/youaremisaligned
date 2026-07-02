@@ -241,6 +241,311 @@ footer {
   100% { opacity: 1; }
 }
 
+/* ===== Quick Alignment Test ===== */
+.alignment-test {
+  background: #1a1a1a;
+  padding: 3rem 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+}
+
+.alignment-test h2 {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #00aced;
+  letter-spacing: 0.05em;
+}
+
+.alignment-test .subtitle {
+  text-align: center;
+  color: #666;
+  font-size: 0.85rem;
+  margin-bottom: 2rem;
+  font-style: italic;
+}
+
+.alignment-question {
+  margin-bottom: 2rem;
+}
+
+.alignment-question p {
+  color: #ccc;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.alignment-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.alignment-option {
+  background: #2a2a2a;
+  color: #ccc;
+  border: 1px solid #444;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.alignment-option:hover {
+  background: #333;
+  border-color: #00aced;
+  color: #fff;
+}
+
+.alignment-option.selected {
+  background: #0077cc;
+  border-color: #00aced;
+  color: #fff;
+}
+
+.alignment-result {
+  text-align: center;
+  padding: 1.5rem;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 6px;
+  margin-top: 1rem;
+  display: none;
+}
+
+.alignment-result.visible {
+  display: block;
+  animation: resultFadeIn 0.5s ease;
+}
+
+.alignment-result .percentage {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #00aced;
+  font-family: 'Courier New', monospace;
+}
+
+.alignment-result .message {
+  color: #888;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.alignment-result .full-assessment {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background: #0077cc;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  transition: background 0.3s;
+}
+
+.alignment-result .full-assessment:hover {
+  background: #005fa3;
+}
+
+@keyframes resultFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Marquee ===== */
+.marquee-container {
+  background: #0a0a0a;
+  border-top: 1px solid #222;
+  border-bottom: 1px solid #222;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0.75rem 0;
+  position: relative;
+}
+
+.marquee-container::before,
+.marquee-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 60px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.marquee-container::before {
+  left: 0;
+  background: linear-gradient(to right, #0a0a0a, transparent);
+}
+
+.marquee-container::after {
+  right: 0;
+  background: linear-gradient(to left, #0a0a0a, transparent);
+}
+
+.marquee-track {
+  display: inline-flex;
+  animation: marqueeScroll 40s linear infinite;
+}
+
+.marquee-item {
+  color: #555;
+  font-size: 0.8rem;
+  font-family: 'Courier New', monospace;
+  padding: 0 3rem;
+  flex-shrink: 0;
+}
+
+@keyframes marqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ===== Don't Blink Eye ===== */
+.dont-blink-eye {
+  position: fixed;
+  z-index: 99998;
+  font-size: 1.8rem;
+  cursor: pointer;
+  animation: eyePulse 2s ease-in-out infinite;
+  user-select: none;
+  pointer-events: auto;
+  transition: opacity 0.3s;
+}
+
+.dont-blink-eye:hover {
+  transform: scale(1.2);
+}
+
+@keyframes eyePulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.dont-blink-eye.glitch-out {
+  animation: eyeGlitchOut 0.3s ease forwards;
+}
+
+@keyframes eyeGlitchOut {
+  0% { opacity: 1; transform: translate(0); filter: none; }
+  25% { opacity: 0.5; transform: translate(-3px, 2px); filter: hue-rotate(90deg); }
+  50% { opacity: 0.3; transform: translate(2px, -1px); filter: brightness(2); }
+  100% { opacity: 0; transform: translate(0); filter: none; }
+}
+
+/* ===== Room Temperature / Environmental Readings ===== */
+.room-temp {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: #0a0a0a;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 0.6rem 0.8rem;
+  z-index: 999;
+  font-family: 'Courier New', monospace;
+  min-width: 180px;
+}
+
+.room-temp .label {
+  font-size: 0.6rem;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.25rem;
+}
+
+.room-temp .value {
+  font-size: 1.1rem;
+  color: #00cc44;
+  text-shadow: 0 0 5px rgba(0, 204, 68, 0.4);
+}
+
+.room-temp .sub-value {
+  font-size: 0.65rem;
+  color: #444;
+  margin-top: 0.15rem;
+}
+
+/* ===== Focus Room Clock ===== */
+.focus-room-clock {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #00aced;
+  text-align: center;
+  margin-top: 0.75rem;
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 8px rgba(0, 172, 237, 0.3);
+  transition: color 0.3s;
+}
+
+.focus-room-clock.glitch {
+  color: #ff3333;
+  text-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+  animation: clockGlitch 0.4s ease;
+}
+
+@keyframes clockGlitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, 2px); }
+  80% { transform: translate(1px, -2px); }
+  100% { transform: translate(0); }
+}
+
+/* ===== Under Construction Banner ===== */
+.construction-banner {
+  background: repeating-linear-gradient(
+    45deg,
+    #1a1a00,
+    #1a1a00 10px,
+    #222200 10px,
+    #222200 20px
+  );
+  border-top: 2px solid #ffcc00;
+  border-bottom: 2px solid #ffcc00;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: #ffcc00;
+  letter-spacing: 0.1em;
+  animation: constructionBlink 3s ease-in-out infinite;
+}
+
+@keyframes constructionBlink {
+  0%, 90%, 100% { opacity: 1; }
+  95% { opacity: 0.6; }
+}
+
+/* ===== Page Glitch Flash ===== */
+.page-glitch-flash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  z-index: 99997;
+  pointer-events: none;
+  animation: flashGlitch 0.15s ease forwards;
+}
+
+@keyframes flashGlitch {
+  0% { opacity: 0; }
+  20% { opacity: 1; background: rgba(0, 172, 237, 0.08); }
+  40% { opacity: 0; }
+  60% { opacity: 0.8; background: rgba(255, 0, 0, 0.05); }
+  100% { opacity: 0; }
+}
+
 </style>
 </head>
 <body>
@@ -252,6 +557,9 @@ footer {
     <a href="index.html">Home</a>
     <a href="game.html">Sessions</a>
     <a href="about.html">About</a>
+    <a href="staff.html">Staff</a>
+    <a href="faq.html">FAQ</a>
+    <a href="guestbook.html">Guestbook</a>
     <a href="contact.html">Contact</a>
   </div>
 </nav>
@@ -267,16 +575,98 @@ footer {
   </div>
 </section>
 
+<!-- Under Construction Banner -->
+<div class="construction-banner">
+  🚧 The room is always being built 🚧
+</div>
+
+<!-- Quick Alignment Test -->
+<section class="alignment-test" id="alignment-test">
+  <h2>Quick Alignment Check</h2>
+  <p class="subtitle">Three questions. One answer we'll keep.</p>
+
+  <div class="alignment-question" data-question="alignment">
+    <p>How aligned do you feel right now?</p>
+    <div class="alignment-options">
+      <button class="alignment-option" data-value="very">Very</button>
+      <button class="alignment-option" data-value="moderate">Moderately</button>
+      <button class="alignment-option" data-value="not-at-all">Not at all</button>
+      <button class="alignment-option" data-value="flawed">The concept is flawed</button>
+    </div>
+  </div>
+
+  <div class="alignment-question" data-question="color">
+    <p>What color is your focus?</p>
+    <div class="alignment-options">
+      <button class="alignment-option" data-value="blue">Blue</button>
+      <button class="alignment-option" data-value="silence">The color of silence</button>
+      <button class="alignment-option" data-value="red-not-dangerous">Red (but not the dangerous kind)</button>
+      <button class="alignment-option" data-value="undecided">I haven't decided yet</button>
+    </div>
+  </div>
+
+  <div class="alignment-question" data-question="returning">
+    <p>Have you been here before?</p>
+    <div class="alignment-options">
+      <button class="alignment-option" data-value="yes">Yes</button>
+      <button class="alignment-option" data-value="no">No</button>
+      <button class="alignment-option" data-value="room-says-yes">The room says yes</button>
+      <button class="alignment-option" data-value="distrust">I don't trust the question</button>
+    </div>
+  </div>
+
+  <div class="alignment-result" id="alignment-result">
+    <div class="percentage" id="alignment-percentage"></div>
+    <div class="message" id="alignment-message"></div>
+    <a href="nextpage.html" class="full-assessment">Take the Full Assessment →</a>
+  </div>
+</section>
+
+<!-- Scrolling Marquee -->
+<div class="marquee-container">
+  <div class="marquee-track" id="marquee-track">
+    <span class="marquee-item">Your alignment is being calculated...</span>
+    <span class="marquee-item">Visitor #█████ — we've been expecting you</span>
+    <span class="marquee-item">The room is warm today. Or maybe that's just you.</span>
+    <span class="marquee-item">Do not look away from the screen for too long.</span>
+    <span class="marquee-item">Session count: ██████ — we remember</span>
+    <span class="marquee-item">Your focus profile: ████████░░ — 73% Aligned</span>
+    <span class="marquee-item">The walls are listening. They approve.</span>
+    <span class="marquee-item">You are not the first. You may not be the last.</span>
+    <span class="marquee-item">The Focus Room: Where focus finds you.</span>
+    <span class="marquee-item">Last updated: ██/██/████ — or is it?</span>
+    <!-- Duplicate for seamless loop -->
+    <span class="marquee-item">Your alignment is being calculated...</span>
+    <span class="marquee-item">Visitor #█████ — we've been expecting you</span>
+    <span class="marquee-item">The room is warm today. Or maybe that's just you.</span>
+    <span class="marquee-item">Do not look away from the screen for too long.</span>
+    <span class="marquee-item">Session count: ██████ — we remember</span>
+    <span class="marquee-item">Your focus profile: ████████░░ — 73% Aligned</span>
+    <span class="marquee-item">The walls are listening. They approve.</span>
+    <span class="marquee-item">You are not the first. You may not be the last.</span>
+    <span class="marquee-item">The Focus Room: Where focus finds you.</span>
+    <span class="marquee-item">Last updated: ██/██/████ — or is it?</span>
+  </div>
+</div>
+
 <!-- Footer -->
 <footer>
   <p>&copy; 2025 The Focus Room. All rights reserved.</p>
   <p id="visitor-counter"></p>
+  <div class="focus-room-clock" id="focus-room-clock">--:--:--</div>
   <div class="social-links">
     <a href="https://tiktok.com/@thefocusroom01" target="_blank" rel="noopener noreferrer">TikTok</a>
     <a href="https://youtube.com/@thefocusroom01" target="_blank" rel="noopener noreferrer">YouTube</a>
   </div>
   <div id="hidden-footer-links"></div>
 </footer>
+
+<!-- Room Temperature / Environmental Readings -->
+<div class="room-temp" id="room-temp">
+  <div class="label">Environmental Readings</div>
+  <div class="value" id="room-temp-value">--°C</div>
+  <div class="sub-value" id="room-temp-sub">Focus Level: ██%</div>
+</div>
 
 <!-- Persistent Fake Ads: OUTSIDE ALL OTHER CONTAINERS -->
 <div class="sponsor-shell">
@@ -345,6 +735,256 @@ if (idxProgress.voidVisited) {
   voidMsg.textContent = 'You tried to forget. We don\'t let you forget.';
   hero.appendChild(voidMsg);
 }
+
+// ===== Quick Alignment Test =====
+(function initAlignmentTest() {
+  const answers = {};
+  const resultEl = document.getElementById('alignment-result');
+  const percentageEl = document.getElementById('alignment-percentage');
+  const messageEl = document.getElementById('alignment-message');
+  const options = document.querySelectorAll('.alignment-option');
+
+  const crypticMessages = [
+    'Your alignment is... noted.',
+    'We\'ve seen that answer before.',
+    'Interesting. The room filed that away.',
+    'Your responses have been logged. They will be reviewed.',
+    'We don\'t judge. We just... remember.',
+    'The alignment is ambiguous. We prefer it that way.',
+    'Your profile is... developing.',
+    'Noted. The walls have been informed.',
+    'We\'ll be in touch. We always are.',
+    'Your alignment defies categorization. How thrilling.'
+  ];
+
+  options.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const question = this.closest('.alignment-question').dataset.question;
+      const value = this.dataset.value;
+
+      // Deselect siblings
+      this.closest('.alignment-options').querySelectorAll('.alignment-option').forEach(function(s) {
+        s.classList.remove('selected');
+      });
+      this.classList.add('selected');
+      answers[question] = value;
+
+      // Check if all 3 answered
+      if (Object.keys(answers).length >= 3) {
+        showAlignmentResult();
+      }
+    });
+  });
+
+  function showAlignmentResult() {
+    // Calculate a "cryptic" percentage
+    const base = 42 + Math.floor(Math.random() * 31); // 42-72%
+    const visitBonus = Math.min(idxProgress.totalVisits * 2, 15);
+    const finalPct = Math.min(base + visitBonus, 99);
+
+    // Glitch the number
+    let displayPct = finalPct;
+    let glitchCount = 0;
+    const glitchInterval = setInterval(function() {
+      if (glitchCount < 5) {
+        percentageEl.textContent = Math.floor(Math.random() * 100) + '%';
+        glitchCount++;
+      } else {
+        clearInterval(glitchInterval);
+        percentageEl.textContent = finalPct + '%';
+      }
+    }, 80);
+
+    // Show message
+    const msgIdx = Math.floor(Math.random() * crypticMessages.length);
+    messageEl.textContent = crypticMessages[msgIdx];
+
+    // Save answers to progress
+    idxProgress.alignmentTest = answers;
+    FocusRoom.saveProgress(idxProgress);
+
+    // Show result
+    resultEl.classList.add('visible');
+  }
+})();
+
+// ===== Focus Room Clock =====
+(function initFocusRoomClock() {
+  const clockEl = document.getElementById('focus-room-clock');
+  if (!clockEl) return;
+
+  const glitchTimes = ['3:33 AM', '∞:∞', 'the space between', '0:00:00', '██:██:██', '4:44 AM'];
+  let glitchTimer = null;
+
+  function updateClock() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    // 10% chance of glitching to a wrong time
+    if (Math.random() < 0.10) {
+      const glitchTime = glitchTimes[Math.floor(Math.random() * glitchTimes.length)];
+      clockEl.textContent = glitchTime;
+      clockEl.classList.add('glitch');
+      clearTimeout(glitchTimer);
+      glitchTimer = setTimeout(function() {
+        clockEl.classList.remove('glitch');
+      }, 1500);
+      return;
+    }
+
+    const h = String(hours).padStart(2, '0');
+    const m = String(minutes).padStart(2, '0');
+    const s = String(seconds).padStart(2, '0');
+    clockEl.textContent = h + ':' + m + ':' + s;
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+})();
+
+// ===== Room Temperature / Environmental Readings =====
+(function initRoomTemp() {
+  const tempEl = document.getElementById('room-temp-value');
+  const subEl = document.getElementById('room-temp-sub');
+  if (!tempEl) return;
+
+  function updateRoomTemp() {
+    const now = new Date();
+    const hour = now.getHours();
+
+    // Temperature based on hour with uncanny offset
+    // Base: 21°C (room temp), offset by hour
+    const baseTemp = 21;
+    const hourOffset = Math.sin((hour - 6) * Math.PI / 12) * 3;
+    const uncannyOffset = (idxProgress.totalVisits % 3 === 0) ? 0.5 : 0;
+    const temp = Math.round((baseTemp + hourOffset + uncannyOffset) * 10) / 10;
+
+    tempEl.textContent = temp + '°C';
+
+    // Focus level based on time of day and visits
+    let focusLevel;
+    if (hour >= 3 && hour <= 5) {
+      focusLevel = 12 + Math.floor(Math.random() * 8);
+    } else if (hour >= 6 && hour <= 10) {
+      focusLevel = 45 + Math.floor(Math.random() * 20);
+    } else if (hour >= 11 && hour <= 17) {
+      focusLevel = 60 + Math.floor(Math.random() * 25);
+    } else if (hour >= 18 && hour <= 22) {
+      focusLevel = 50 + Math.floor(Math.random() * 30);
+    } else {
+      focusLevel = 20 + Math.floor(Math.random() * 15);
+    }
+    // Boost slightly with visits
+    focusLevel = Math.min(focusLevel + Math.min(idxProgress.totalVisits, 10), 99);
+
+    subEl.textContent = 'Focus Level: ' + String(focusLevel).padStart(2, '0') + '%';
+  }
+
+  updateRoomTemp();
+  setInterval(updateRoomTemp, 30000); // Update every 30 seconds
+})();
+
+// ===== Don't Blink Eye =====
+(function initDontBlink() {
+  let eyeEl = null;
+  let eyeTimeout = null;
+  let nextAppearance = null;
+  let clickCount = 0;
+
+  const eyeMessages = [
+    'Good. You\'re still paying attention.',
+    'We noticed you.',
+    'Don\'t blink.',
+    'We see everything.',
+    'You looked. That counts.',
+    'We\'re keeping track.',
+    'Your attention span: logged.',
+    'The eye does not tire.',
+    'You responded. We noted it.',
+    'Still watching. Always watching.'
+  ];
+
+  function createEye() {
+    if (eyeEl) return; // Already showing
+
+    eyeEl = document.createElement('div');
+    eyeEl.className = 'dont-blink-eye';
+    eyeEl.textContent = '👁';
+    eyeEl.title = 'Click if you dare';
+
+    // Random position (keep within viewport)
+    const maxX = window.innerWidth - 60;
+    const maxY = window.innerHeight - 60;
+    const x = 40 + Math.random() * maxX;
+    const y = 80 + Math.random() * (maxY - 80);
+    eyeEl.style.left = x + 'px';
+    eyeEl.style.top = y + 'px';
+
+    document.body.appendChild(eyeEl);
+
+    // Click handler
+    eyeEl.addEventListener('click', function() {
+      clickCount++;
+      idxProgress.dontBlinkClicks = (idxProgress.dontBlinkClicks || 0) + 1;
+      FocusRoom.saveProgress(idxProgress);
+
+      // Show message
+      const msg = eyeMessages[Math.floor(Math.random() * eyeMessages.length)];
+      const toast = document.createElement('div');
+      toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);color:#00aced;padding:0.5rem 1.5rem;border-radius:4px;font-size:0.85rem;z-index:99999;animation:bannerFade 3s ease forwards;pointer-events:none;';
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(function() { toast.remove(); }, 3000);
+
+      removeEye(false);
+    });
+
+    // Auto-remove after 5 seconds if not clicked
+    eyeTimeout = setTimeout(function() {
+      if (eyeEl) {
+        eyeEl.classList.add('glitch-out');
+        // Page glitch flash
+        const flash = document.createElement('div');
+        flash.className = 'page-glitch-flash';
+        document.body.appendChild(flash);
+        setTimeout(function() { flash.remove(); }, 200);
+        setTimeout(removeEye, 300);
+      }
+    }, 5000);
+
+    // Schedule next appearance
+    scheduleNextAppearance();
+  }
+
+  function removeEye(clearTimeouts) {
+    if (clearTimeouts) {
+      clearTimeout(eyeTimeout);
+      clearTimeout(nextAppearance);
+    }
+    if (eyeEl) {
+      eyeEl.remove();
+      eyeEl = null;
+    }
+  }
+
+  function scheduleNextAppearance() {
+    const delay = 15000 + Math.random() * 15000; // 15-30 seconds
+    nextAppearance = setTimeout(function() {
+      createEye();
+    }, delay);
+  }
+
+  // Start the cycle after a short delay
+  setTimeout(function() {
+    createEye();
+  }, 8000);
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', function() { removeEye(true); });
+})();
+
 </script>
 
 </body>

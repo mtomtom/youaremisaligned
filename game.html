@@ -12,6 +12,19 @@
 </head>
 <body>
 
+  <nav class="shared-nav">
+    <a href="index.html" class="logo">The Focus Room</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="game.html">Sessions</a>
+      <a href="about.html">About</a>
+      <a href="staff.html">Staff</a>
+      <a href="faq.html">FAQ</a>
+      <a href="guestbook.html">Guestbook</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
+
   <div id="container">
     <canvas id="roomCanvas" width="800" height="600"></canvas>
 
@@ -22,6 +35,12 @@
       autocomplete="off"
     />
   </div>
+
+  <footer class="shared-footer">
+    <p>&copy; 2025 The Focus Room</p>
+    <p id="visitor-counter"></p>
+    <div id="hidden-footer-links"></div>
+  </footer>
 
   <script src="shared.js"></script>
   <script src="main.js"></script>

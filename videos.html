@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Archive: Sensory Recalibration</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="shared.css">
     <style>
         body {
             background-color: #0a0a0a;
@@ -177,6 +179,19 @@
 </head>
 <body>
 
+<nav class="shared-nav">
+  <a href="index.html" class="logo">The Focus Room</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="game.html">Sessions</a>
+    <a href="about.html">About</a>
+    <a href="staff.html">Staff</a>
+    <a href="faq.html">FAQ</a>
+    <a href="guestbook.html">Guestbook</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+
 <header>
     <h1>ARCHIVE: SENSORY RECALIBRATION LOGS</h1>
     <p>Unauthorized viewing is a violation of Wellness Protocol 09.</p>
@@ -249,11 +264,7 @@ const imagePool = [
     'images/room8.png',
     'images/room9.png',
     'images/room10.png'
-    
 ];
-
-const feedContainer = document.getElementById('random-feed');
-const displayImg = document.getElementById('active-surveillance');
 
 // This selects ALL feeds with the class "image-feed"
 const allImageFeeds = document.querySelectorAll('.image-feed');
@@ -286,6 +297,14 @@ allImageFeeds.forEach(feed => {
     });
 });
 </script>
+
+<footer class="shared-footer">
+    <p>&copy; 2025 The Focus Room</p>
+    <p id="visitor-counter"></p>
+    <div id="hidden-footer-links"></div>
+  </footer>
+
+<script src="shared.js"></script>
 
 </body>
 </html>
