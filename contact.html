@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule Your Session — The Focus Room</title>
+  <meta name="description" content="Schedule your focus alignment session. Professional assessment and subtle experiences await.">
+  <meta name="theme-color" content="#111111">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    body { margin:0; padding:0; font-family:'Helvetica Neue',Arial,sans-serif; background:#f5f7f7; color:#333; }
+    .content { max-width:500px; margin:80px auto 2rem; padding:2rem; }
+    .content h1 { font-weight:200; letter-spacing:2px; text-transform:uppercase; font-size:1.3rem; text-align:center; }
+    .form-group { margin-bottom:1.2rem; }
+    .form-group label { display:block; margin-bottom:0.3rem; font-size:0.9rem; color:#555; }
+    .form-group input, .form-group select, .form-group textarea {
+      width:100%; padding:0.7rem; border:1px solid #ccc; border-radius:4px; font-size:1rem; background:#fff;
+    }
+    .form-group textarea { min-height:80px; resize:vertical; }
+    .submit-btn { width:100%; padding:0.8rem; background:#0077cc; color:#fff; border:none; border-radius:6px; font-size:1rem; cursor:pointer; margin-top:0.5rem; }
+    .submit-btn:hover { background:#005fa3; }
+    #confirmation { display:none; text-align:center; margin-top:1.5rem; padding:1rem; background:#e8f4e8; border-radius:6px; color:#2d7d2d; }
+  </style>
+</head>
+<body>
+  <nav class="shared-nav">
+    <a href="index.html" class="logo">The Focus Room</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="game.html">Sessions</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
+
+  <div class="content">
+    <h1>Schedule Your Session</h1>
+    <form id="contact-form">
+      <div class="form-group">
+        <label for="c-name">Name</label>
+        <input type="text" id="c-name" required>
+      </div>
+      <div class="form-group">
+        <label for="c-email">Email</label>
+        <input type="email" id="c-email" required>
+      </div>
+      <div class="form-group">
+        <label for="c-time">Preferred Assessment Time</label>
+        <select id="c-time">
+          <option value="">Select...</option>
+          <option value="9am">9:00 AM (Morning Alignment)</option>
+          <option value="noon">12:00 PM (Midday Recalibration)</option>
+          <option value="3am">3:00 AM (Deep State Assessment)</option>
+          <option value="whenever">Whenever</option>
+          <option value="between">The space between heartbeats</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="c-msg">Additional Notes</label>
+        <textarea id="c-msg" placeholder="Any relevant context for your session..."></textarea>
+      </div>
+      <button type="submit" class="submit-btn">Request Session</button>
+    </form>
+    <div id="confirmation">
+      <p>Your session has been noted. We will contact you when the room is ready.</p>
+    </div>
+  </div>
+
+  <footer class="shared-footer">
+    <p>&copy; 2025 The Focus Room</p>
+    <p id="visitor-counter"></p>
+    <div id="hidden-footer-links"></div>
+  </footer>
+
+  <script src="shared.js"></script>
+  <script>
+    document.getElementById('contact-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('c-name').value;
+
+      // Sign guestbook automatically
+      const progress = FocusRoom.getProgress();
+      if (!progress.guestbookSigned) {
+        progress.guestbookSigned = true;
+        FocusRoom.saveProgress(progress);
+      }
+
+      document.getElementById('confirmation').style.display = 'block';
+      e.target.reset();
+      e.target.style.display = 'none';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Specialists — The Focus Room</title>
+  <meta name="description" content="Meet the specialists at The Focus Room.">  
+  <meta name="theme-color" content="#111111">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    body { margin:0; padding:0; font-family:'Helvetica Neue',Arial,sans-serif; background:#f5f7f7; color:#333; }
+    .content { max-width:700px; margin:80px auto 2rem; padding:2rem; }
+    .content h1 { font-weight:200; letter-spacing:2px; text-transform:uppercase; font-size:1.4rem; text-align:center; }
+    .staff-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:1.5rem; margin-top:2rem; }
+    .staff-card { background:#fff; border:1px solid #ddd; border-radius:8px; padding:1.5rem; text-align:center; transition: all 0.5s; }
+    .staff-card .avatar { width:80px; height:80px; border-radius:50%; background:#ddd; margin:0 auto 1rem; }
+    .staff-card .name { font-weight:600; font-size:1rem; transition: all 1s; }
+    .staff-card .title { color:#888; font-size:0.85rem; margin-top:0.3rem; }
+    .staff-card.blurred .name { filter: blur(6px); opacity:0.4; }
+    .staff-card.blurred:hover .name { filter: blur(0px); opacity:1; }
+    .staff-card.blurred.sharpened .name { filter: blur(0px); opacity:1; }
+    .observer-banner { display:none; text-align:center; margin-top:2rem; padding:1rem; background:#111; color:#0f0; font-family:'Courier New',monospace; border-radius:4px; font-size:0.9rem; letter-spacing:2px; }
+  </style>
+</head>
+<body>
+  <nav class="shared-nav">
+    <a href="index.html" class="logo">The Focus Room</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="game.html">Sessions</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
+
+  <div class="content">
+    <h1>Our Specialists</h1>
+    <div class="staff-grid">
+      <div class="staff-card"><div class="avatar"></div><div class="name">Dr. Elena Voss</div><div class="title">Lead Alignment Specialist</div></div>
+      <div class="staff-card"><div class="avatar"></div><div class="name">Marcus Chen, PhD</div><div class="title">Cognitive Pattern Analyst</div></div>
+      <div class="staff-card"><div class="avatar"></div><div class="name">Sarah Okafor</div><div class="title">Focus Calibration Director</div></div>
+      <div class="staff-card"><div class="avatar"></div><div class="name">Dr. James Wright</div><div class="title">Senior Data Observer</div></div>
+      <div class="staff-card"><div class="avatar"></div><div class="name">Aisha Patel</div><div class="title">Wellness Protocol Designer</div></div>
+      <div class="staff-card"><div class="avatar"></div><div class="name">Robert Kessler</div><div class="title">Environmental Psychologist</div></div>
+    </div>
+    <div class="observer-banner" id="observer-banner">⚠ OBSERVER MODE ACTIVATED ⚠</div>
+  </div>
+
+  <footer class="shared-footer">
+    <p>&copy; 2025 The Focus Room</p>
+    <p id="visitor-counter"></p>
+    <div id="hidden-footer-links"></div>
+  </footer>
+
+  <script src="shared.js"></script>
+  <script>
+    // After 5 seconds, blur all names
+    setTimeout(() => {
+      document.querySelectorAll('.staff-card').forEach(card => {
+        card.classList.add('blurred');
+      });
+      document.getElementById('observer-banner').style.display = 'block';
+    }, 5000);
+
+    // Touch fallback: tap a card to temporarily sharpen its name
+    document.querySelectorAll('.staff-card').forEach(card => {
+      card.addEventListener('click', () => {
+        card.classList.add('sharpened');
+        setTimeout(() => {
+          card.classList.remove('sharpened');
+        }, 2000);
+      });
+    });
+  </script>
+</body>
+</html>

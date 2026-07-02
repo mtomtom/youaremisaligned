@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Alignment — The Focus Room</title>
+  <meta name="description" content="Your focus alignment assessment results.">
+  <meta property="og:title" content="Your Alignment — The Focus Room">
+  <meta name="theme-color" content="#111111">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: #0a0a0a; color: #ccc;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; padding-top: 80px;
+    }
+    .report-card {
+      max-width: 600px; width: 90%;
+      background: #1a1a1a; border: 1px solid #333;
+      border-radius: 8px; padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .report-card h1 {
+      font-weight: 200; letter-spacing: 3px;
+      text-transform: uppercase; color: #fff;
+      text-align: center; font-size: 1.4rem;
+    }
+    .score-bar {
+      height: 24px; background: #333;
+      border-radius: 4px; overflow: hidden;
+      margin: 1rem 0;
+    }
+    .score-fill {
+      height: 100%; background: linear-gradient(90deg, #ff4d4d, #00aced);
+      transition: width 1s ease;
+      border-radius: 4px;
+    }
+    .score-label {
+      text-align: center; font-size: 2rem; color: #fff; font-weight: bold;
+      margin: 0.5rem 0;
+    }
+    .assessment {
+      font-size: 0.95rem; line-height: 1.6; color: #999;
+      margin: 1.5rem 0; padding: 1rem;
+      border-left: 3px solid #00aced;
+    }
+    .btn-group {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+    .btn {
+      padding: 0.75rem 1.5rem; border: 1px solid #444;
+      background: #222; color: #fff; text-decoration: none;
+      border-radius: 6px; cursor: pointer; font-size: 0.9rem;
+      transition: background 0.3s;
+    }
+    .btn:hover { background: #333; }
+    .btn.primary { background: #0077cc; border-color: #0077cc; }
+    .btn.primary:hover { background: #005fa3; }
+    #certCanvas { display: none; }
+  </style>
+</head>
+<body>
+
+  <nav class="shared-nav">
+    <a href="index.html" class="logo">The Focus Room</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="game.html">Sessions</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
+
+  <div class="report-card" id="report-card">
+    <h1>Your Alignment Report</h1>
+    <div class="score-label" id="score-label">Calculating...</div>
+    <div class="score-bar"><div class="score-fill" id="score-fill"></div></div>
+    <div class="assessment" id="assessment-text"></div>
+    <div class="btn-group">
+      <a href="index.html" class="btn primary">Return to The Focus Room</a>
+      <a href="contact.html" class="btn">Schedule Another Session</a>
+      <button class="btn" id="cert-btn">Download Alignment Certificate</button>
+    </div>
+  </div>
+
+  <footer class="shared-footer">
+    <p>&copy; 2025 The Focus Room</p>
+    <p id="visitor-counter"></p>
+    <div id="hidden-footer-links"></div>
+  </footer>
+
+  <canvas id="certCanvas" width="800" height="600"></canvas>
+
+  <script src="shared.js"></script>
+  <script>
+    const progress = FocusRoom.getProgress();
+
+    // Calculate alignment score (0-100)
+    const totalResponses = (progress.formFieldsCompleted || 0) + (progress.gameInputs?.length || 0);
+    const calmRatio = totalResponses > 0
+      ? (progress.calmCount || 0) / totalResponses
+      : 0.5;
+    // Score varies based on actual engagement and response patterns
+    const alignmentScore = Math.min(100, Math.max(5,
+      20 + (progress.formFieldsCompleted * 1.5) + (progress.gameInputs?.length || 0) * 1.5
+      + (calmRatio * 20) - (progress.fearCount || 0) * 3
+    ));
+    const score = Math.round(alignmentScore);
+
+    // Update score display
+    document.getElementById('score-label').textContent = `${score}% Aligned`;
+    setTimeout(() => {
+      document.getElementById('score-fill').style.width = score + '%';
+    }, 200);
+
+    // Generate assessment paragraph
+    const templates = [
+      () => `Your focus profile indicates ${score > 60 ? 'moderate alignment with conventional awareness structures' : 'significant deviation from standard cognitive baselines'}. The room has observed ${progress.gameInputs?.length || 0} input patterns and ${progress.formFieldsCompleted || 0} data points. ${progress.fearCount > 2 ? 'Fear responses were elevated — this is normal. The room adjusts to you.' : 'Your responses suggest stability, though the room suspects there is more beneath the surface.'}`,
+      () => `Subject ${progress.totalVisits > 3 ? 'has returned frequently, indicating unresolved misalignment' : 'presents with ${score > 50 ? 'adequate' : 'notable'} focus coherence'}. ${progress.formResponses?.length > 5 ? 'Form data reveals patterns the room finds... interesting.' : 'More data is required for full assessment.'}`,
+      () => `Alignment score: ${score}%. ${score > 80 ? 'You are dangerously close to being "normal." The room is concerned.' : score > 50 ? 'Your alignment is within acceptable parameters. Do not become complacent.' : 'The room sees potential in your misalignment. Continue to resist categorization.'}`
+    ];
+
+    const assessmentEl = document.getElementById('assessment-text');
+    assessmentEl.textContent = templates[Math.floor(Math.random() * templates.length)]();
+
+    // Certificate generation
+    document.getElementById('cert-btn').addEventListener('click', () => {
+      const certCanvas = document.getElementById('certCanvas');
+      const cctx = certCanvas.getContext('2d');
+      // White background
+      cctx.fillStyle = '#fff';
+      cctx.fillRect(0, 0, 800, 600);
+      // Border
+      cctx.strokeStyle = '#00aced';
+      cctx.lineWidth = 4;
+      cctx.strokeRect(20, 20, 760, 560);
+      // Title
+      cctx.fillStyle = '#111';
+      cctx.font = 'bold 36px serif';
+      cctx.textAlign = 'center';
+      cctx.fillText('Certificate of Alignment', 400, 120);
+      // Score
+      cctx.font = '24px sans-serif';
+      cctx.fillText(`Subject has achieved ${score}% Alignment`, 400, 200);
+      // Details
+      cctx.font = '16px sans-serif';
+      cctx.fillStyle = '#666';
+      cctx.fillText(`Sessions completed: ${progress.totalVisits}`, 400, 280);
+      cctx.fillText(`Data points submitted: ${totalResponses}`, 400, 310);
+      cctx.fillText(`Fear response ratio: ${((progress.fearCount || 0) / Math.max(1, totalResponses) * 100).toFixed(1)}%`, 400, 340);
+      // Cryptic message
+      cctx.fillStyle = '#999';
+      cctx.font = 'italic 14px serif';
+      const messages = [
+        'The room remembers what you forget.',
+        'Alignment is not a destination.',
+        'You are more than your data.',
+        'The assessment never ends.'
+      ];
+      cctx.fillText(messages[Math.floor(Math.random() * messages.length)], 400, 450);
+      // Date
+      cctx.fillStyle = '#333';
+      cctx.font = '12px sans-serif';
+      cctx.fillText(`Issued: ${new Date().toISOString().split('T')[0]}`, 400, 520);
+      // Trigger print
+      const link = document.createElement('a');
+      link.download = 'alignment-certificate.png';
+      link.href = certCanvas.toDataURL();
+      link.click();
+    });
+  </script>
+</body>
+</html>

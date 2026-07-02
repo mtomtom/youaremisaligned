@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — The Focus Room</title>
+  <meta name="description" content="About our focus alignment methodology.">
+  <meta name="theme-color" content="#111111">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    body { margin:0; padding:0; font-family:'Helvetica Neue',Arial,sans-serif; background:#f5f7f7; color:#333; }
+    .content { max-width:700px; margin:80px auto 2rem; padding:2rem; line-height:1.8; }
+    .content h1 { font-weight:200; letter-spacing:2px; text-transform:uppercase; font-size:1.6rem; }
+    .content h2 { margin-top:2rem; font-weight:300; color:#555; }
+    .content p { color:#444; }
+    .glitch-date { font-family:'Courier New',monospace; transition: all 0.3s; }
+    .method-list { list-style:none; padding:0; }
+    .method-list li { padding:0.5rem 0; border-bottom:1px solid #ddd; color:#555; }
+    .method-list li.hidden-method { color:#ccc; }
+    .method-list li.hidden-method:hover { color:#333; }
+    .scroll-shift { transition: color 0.5s; }
+  </style>
+</head>
+<body>
+  <nav class="shared-nav">
+    <a href="index.html" class="logo">The Focus Room</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="game.html">Sessions</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
+
+  <div class="content">
+    <h1>About The Focus Room</h1>
+    <p>The Focus Room was founded in <span class="glitch-date" id="founded-date">2019</span> with a simple mission: to help people achieve optimal cognitive alignment through structured self-assessment.</p>
+
+    <h2>Our Mission</h2>
+    <p class="scroll-shift">We believe that true focus is not a skill — it is a state of being that can be measured, adjusted, and refined. Our proprietary assessment protocols have helped thousands of individuals discover their baseline alignment.</p>
+
+    <h2>Our Method</h2>
+    <ul class="method-list">
+      <li>Phase 1: Baseline data collection through guided self-reflection</li>
+      <li>Phase 2: Environmental response mapping</li>
+      <li>Phase 3: Cognitive pattern analysis</li>
+      <li class="hidden-method">Phase 4: Subject behavioral modification</li>
+      <li class="hidden-method">Phase 5: Long-term observation protocol</li>
+      <li class="hidden-method">Phase 6: ████████████████</li>
+    </ul>
+
+    <h2>Our Philosophy</h2>
+    <p class="scroll-shift">Every individual carries an alignment signature — a unique pattern of focus, distraction, and awareness that can be quantified. The room listens. The room remembers.</p>
+
+    <p style="text-align:center; margin-top:3rem; color:#999; font-size:0.85rem;">
+      <a href="guestbook.html" style="color:#777;">Sign our visitor log</a>
+    </p>
+  </div>
+
+  <footer class="shared-footer">
+    <p>&copy; 2025 The Focus Room</p>
+    <p id="visitor-counter"></p>
+    <div id="hidden-footer-links"></div>
+  </footer>
+
+  <script src="shared.js"></script>
+  <script>
+    // Date glitch effect
+    const dateEl = document.getElementById('founded-date');
+    const years = ['2019', '201█', '███9', '2019', '0019', '2019'];
+    let yearIdx = 0;
+    setInterval(() => {
+      yearIdx = (yearIdx + 1) % years.length;
+      dateEl.textContent = years[yearIdx];
+    }, 4000);
+
+    // Scroll-based text shift
+    const shiftElements = document.querySelectorAll('.scroll-shift');
+    shiftElements.forEach(el => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) {
+            el.style.color = '#ccc';
+          } else {
+            el.style.color = '';
+          }
+        });
+      }, { threshold: 0.3 });
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

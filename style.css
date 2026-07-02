@@ -29,3 +29,35 @@ body {
   color: #ccc;
   outline: none;
 }
+
+/* Mobile responsive additions */
+@media (max-width: 850px) {
+  #roomCanvas {
+    width: 100vw !important;
+    height: auto !important;
+    max-width: 800px;
+  }
+  #inputBox {
+    width: 90vw !important;
+    max-width: 780px;
+  }
+}
+
+@media (max-width: 600px) {
+  #roomCanvas {
+    width: 100vw !important;
+    height: 60vw !important;
+  }
+  #inputBox {
+    width: 95vw !important;
+    padding: 12px;
+  }
+  .shared-nav {
+    flex-direction: column;
+    padding: 0.5rem 1rem;
+  }
+  .shared-nav .nav-links a {
+    margin-left: 0.8rem;
+    font-size: 0.8rem;
+  }
+}

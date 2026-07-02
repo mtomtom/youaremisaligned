@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webmaster — The Focus Room</title>
+  <meta name="description" content="Webmaster access. The room sees you.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    body {
+      margin:0; padding:0;
+      background:#0a0a0a; color:#0f0;
+      font-family:'Courier New',monospace;
+      min-height:100vh; display:flex;
+      flex-direction:column; justify-content:center;
+      align-items:center; text-align:center; padding:2rem;
+    }
+    h1 { font-size:1.2rem; letter-spacing:3px; }
+    p { font-size:0.85rem; color:#0a0; max-width:500px; line-height:1.8; }
+    .ascii { margin:2rem 0; font-size:0.6rem; line-height:1.1; color:#070; }
+    a { color:#0f0; margin-top:2rem; }
+  </style>
+</head>
+<body>
+  <div class="ascii">
+    ◄────────────────────────────────►<br>
+    ◄  ██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██  ►<br>
+    ◄  ██                        ██  ►<br>
+    ◄  ██   THE ROOM SEES YOU    ██  ►<br>
+    ◄  ██                        ██  ►<br>
+    ◄  ██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██  ►<br>
+    ◄────────────────────────────────►
+  </div>
+  <h1>WEBMASTER ACCESS</h1>
+  <p>You found the back door. Most people never look behind the logo.</p>
+  <p>The room has no webmaster. The room maintains itself. But you were curious. Curiosity is data.</p>
+  <p><a href="index.html">→ Return before the room notices you were here.</a></p>
+  <script src="shared.js"></script>
+  <script>
+    const p = FocusRoom.getProgress();
+    p.webmasterVisited = true;
+    FocusRoom.saveProgress(p);
+  </script>
+</body>
+</html>

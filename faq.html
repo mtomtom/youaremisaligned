@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQ — The Focus Room</title>
+  <meta name="description" content="Frequently asked questions about The Focus Room.">  
+  <meta name="theme-color" content="#111111">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    body { margin:0; padding:0; font-family:'Helvetica Neue',Arial,sans-serif; background:#f5f7f7; color:#333; }
+    .content { max-width:700px; margin:80px auto 2rem; padding:2rem; }
+    .content h1 { font-weight:200; letter-spacing:2px; text-transform:uppercase; font-size:1.4rem; text-align:center; }
+    .faq-item { border-bottom:1px solid #ddd; padding:1rem 0; }
+    .faq-q { font-weight:600; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
+    .faq-q::after { content:'+'; font-size:1.2rem; }
+    .faq-item.open .faq-q::after { content:'−'; }
+    .faq-a { display:none; margin-top:0.5rem; color:#666; line-height:1.6; }
+    .faq-item.open .faq-a { display:block; }
+    .safe-buttons { margin-top:0.5rem; }
+    #yes-btn { padding:0.3rem 0.8rem; background:#4CAF50; color:#fff; border:none; border-radius:4px; cursor:pointer; margin-right:0.5rem; }
+    #no-btn { padding:0.3rem 0.8rem; background:#f44336; color:#fff; border:none; border-radius:4px; cursor:pointer; position:relative; transition: all 0.15s; }
+  </style>
+</head>
+<body>
+  <nav class="shared-nav">
+    <a href="index.html" class="logo">The Focus Room</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
+
+  <div class="content">
+    <h1>Frequently Asked Questions</h1>
+
+    <div class="faq-item">
+      <div class="faq-q">What is The Focus Room?</div>
+      <div class="faq-a">A professional wellness assessment facility specializing in cognitive alignment and focus calibration. We help you understand how well you're aligned with yourself.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">How long does a session take?</div>
+      <div class="faq-a">Sessions vary in duration. Most participants complete their assessment in one sitting. Some find themselves returning. This is normal.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Is this safe?</div>
+      <div class="faq-a">
+        <div class="safe-buttons">
+          <button id="yes-btn">Yes</button>
+          <button id="no-btn">No</button>
+        </div>
+        <p id="safe-answer" style="margin-top:0.5rem; font-style:italic; color:#999;"></p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Can I leave the room at any time?</div>
+      <div class="faq-a">The exit is always available. However, our data suggests that those who leave early experience 340% more doubt in their daily lives. Consider staying.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">What happens to my data?</div>
+      <div class="faq-a">Your data is stored, analyzed, and occasionally contemplated by the room itself. We do not share personal information with third parties, unless the room requests it.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Why do the walls feel different each time?</div>
+      <div class="faq-a">They don't. But your perception is part of the assessment. If the walls feel different, it means the room is working.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Who runs this place?</div>
+      <div class="faq-a">That information is classified under Protocol 7. However, you can view our <a href="staff.html">specialists</a> page.</div>
+    </div>
+  </div>
+
+  <footer class="shared-footer">
+    <p>&copy; 2025 The Focus Room</p>
+    <p id="visitor-counter"></p>
+    <div id="hidden-footer-links"></div>
+  </footer>
+
+  <script src="shared.js"></script>
+  <script>
+    // Accordion
+    document.querySelectorAll('.faq-q').forEach(q => {
+      q.addEventListener('click', () => {
+        q.parentElement.classList.toggle('open');
+      });
+    });
+
+    // "No" button dodge (like nextpage.html)
+    const noBtn = document.getElementById('no-btn');
+    const safeAnswer = document.getElementById('safe-answer');
+    let noClicks = 0;
+    const unhingedAnswers = [
+      "Are you sure you want to know?",
+      "The room doesn't like that answer.",
+      "We've logged your hesitation.",
+      "Your doubt has been noted. Again.",
+      "The walls are taking sides."
+    ];
+
+    // Mobile: make clickable after 3 seconds
+    const isTouchDevice = 'ontouchstart' in window;
+    let dodgeActive = true;
+
+    if (isTouchDevice) {
+      setTimeout(() => { dodgeActive = false; }, 3000);
+    }
+
+    noBtn.addEventListener('mouseenter', (e) => {
+      if (!dodgeActive) return;
+      const rect = noBtn.getBoundingClientRect();
+      const newX = Math.random() * 100 - 50;
+      const newY = Math.random() * 40 - 20;
+      noBtn.style.transform = `translate(${newX}px, ${newY}px)`;
+    });
+
+    noBtn.addEventListener('click', () => {
+      noClicks++;
+      safeAnswer.textContent = unhingedAnswers[Math.min(noClicks - 1, unhingedAnswers.length - 1)];
+      // Shrink button
+      const scale = Math.max(0.3, 1 - noClicks * 0.15);
+      noBtn.style.transform = `scale(${scale})`;
+    });
+  </script>
+</body>
+</html>

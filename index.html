@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Focus Room</title>
+<meta name="description" content="The Focus Room awaits your assessment. Professional focus alignment and wellness evaluation.">
+<meta property="og:title" content="The Focus Room">
+<meta property="og:description" content="Professional assessment and subtle focus experiences await you.">
+<meta name="theme-color" content="#111111">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="shared.css">
 
 <style>
 /* ===== Global Styles ===== */
@@ -243,10 +249,10 @@ footer {
 <nav>
   <div class="logo">The Focus Room</div>
   <div class="tabs">
-    <a href="#">Home</a>
-    <a href="#">Sessions</a>
-    <a href="#">About</a>
-    <a href="#">Contact</a>
+    <a href="index.html">Home</a>
+    <a href="game.html">Sessions</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
   </div>
 </nav>
 
@@ -264,10 +270,12 @@ footer {
 <!-- Footer -->
 <footer>
   <p>&copy; 2025 The Focus Room. All rights reserved.</p>
+  <p id="visitor-counter"></p>
   <div class="social-links">
-    <a href="https://tiktok.com/@thefocusroom01" target="_blank">TikTok</a>
-    <a href="https://youtube.com/@thefocusroom01" target="_blank">YouTube</a>
+    <a href="https://tiktok.com/@thefocusroom01" target="_blank" rel="noopener noreferrer">TikTok</a>
+    <a href="https://youtube.com/@thefocusroom01" target="_blank" rel="noopener noreferrer">YouTube</a>
   </div>
+  <div id="hidden-footer-links"></div>
 </footer>
 
 <!-- Persistent Fake Ads: OUTSIDE ALL OTHER CONTAINERS -->
@@ -280,6 +288,7 @@ footer {
 </div>
 
 
+<script src="shared.js"></script>
 <script>
 // CTA Button: glitch images and hero animation
 const button = document.getElementById('check-alignment');
@@ -288,6 +297,9 @@ const insideImg = document.getElementById('inside-img');
 
 button.addEventListener('click', (e) => {
   e.preventDefault();
+
+  // Resume audio for Mobile Safari
+  if (window.resumeAudio) window.resumeAudio();
 
   // Swap images
   insideImg.src = 'glitch_clinic_inside.png';
@@ -303,12 +315,37 @@ button.addEventListener('click', (e) => {
   // Redirect after 1 second
   setTimeout(() => window.location.href = 'nextpage.html', 1000);
 });
+
+// Triple-click logo easter egg → webmaster.html
+const logo = document.querySelector('nav .logo');
+let logoClicks = 0;
+let logoClickTimer = null;
+logo.addEventListener('click', () => {
+  logoClicks++;
+  clearTimeout(logoClickTimer);
+  logoClickTimer = setTimeout(() => { logoClicks = 0; }, 500);
+  if (logoClicks >= 3) {
+    logoClicks = 0;
+    alert('👁 THE WATCHER SEES YOU 👁');
+    window.location.href = 'webmaster.html';
+  }
+});
+
+// Background changes based on session count
+const idxProgress = FocusRoom.getProgress();
+if (idxProgress.totalVisits > 3) {
+  // Subtle shift: darker background on return visits
+  document.getElementById('hero').style.filter = `brightness(${Math.max(0.6, 1 - (idxProgress.totalVisits * 0.03))})`;
+}
+// Void visitor: the room remembers
+if (idxProgress.voidVisited) {
+  const hero = document.getElementById('hero');
+  const voidMsg = document.createElement('p');
+  voidMsg.style.cssText = 'text-align:center; color:#666; font-style:italic; margin-top:2rem; font-size:0.95rem;';
+  voidMsg.textContent = 'You tried to forget. We don\'t let you forget.';
+  hero.appendChild(voidMsg);
+}
 </script>
 
 </body>
 </html>
-
-
-
-
-

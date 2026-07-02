@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visitor Log — The Focus Room</title>
+  <meta name="description" content="Sign the visitor log at The Focus Room.">  
+  <meta name="theme-color" content="#111111">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    body { margin:0; padding:0; font-family:'Helvetica Neue',Arial,sans-serif; background:#f5f7f7; color:#333; }
+    .content { max-width:600px; margin:80px auto 2rem; padding:2rem; }
+    .content h1 { font-weight:200; letter-spacing:2px; text-transform:uppercase; font-size:1.3rem; text-align:center; }
+    .entry { padding:0.8rem; border-bottom:1px solid #ddd; font-size:0.9rem; }
+    .entry .name { font-weight:600; color:#0077cc; }
+    .entry .text { color:#666; margin-top:0.3rem; }
+    .entry .date { color:#999; font-size:0.75rem; margin-top:0.2rem; }
+    .entry.altered { border-left:3px solid #00aced; }
+    #sign-form { margin-top:2rem; padding-top:1rem; border-top:2px solid #ddd; }
+    #sign-form input { width:100%; padding:0.6rem; border:1px solid #ccc; border-radius:4px; margin-bottom:0.5rem; }
+    #sign-btn { padding:0.5rem 1.5rem; background:#0077cc; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <nav class="shared-nav">
+    <a href="index.html" class="logo">The Focus Room</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+    </div>
+  </nav>
+
+  <div class="content">
+    <h1>Visitor Log</h1>
+    <div id="entries"></div>
+    <div id="sign-form">
+      <h3>Sign the guestbook</h3>
+      <input type="text" id="sign-name" placeholder="Your name...">
+      <button id="sign-btn">Sign</button>
+    </div>
+  </div>
+
+  <footer class="shared-footer">
+    <p>&copy; 2025 The Focus Room</p>
+    <p id="visitor-counter"></p>
+    <div id="hidden-footer-links"></div>
+  </footer>
+
+  <script src="shared.js"></script>
+  <script>
+    const entriesEl = document.getElementById('entries');
+    const progress = FocusRoom.getProgress();
+
+    // Fake entries
+    const fakeEntries = [
+      { name: 'A. Walker', text: 'The room helped me find clarity. I think.', date: '2025-01-14' },
+      { name: 'Subject 47', text: 'I didn\'t know I needed this. Now I\'m not sure I want it.', date: '2025-02-28' },
+      { name: 'M.K.', text: 'The walls here are different than the website photos. More alive.', date: '2025-03-09' },
+      { name: 'Dr. Voss', text: 'Excellent session today. The data was... illuminating.', date: '2025-04-01' },
+      { name: 'Anonymous', text: 'I came once. The room let me back in even though I never signed up for a second session.', date: '2025-05-17' },
+      { name: 'J.R.', text: 'I remember filling out the form. I don\'t remember how I got to the room. The room doesn\'t seem to mind.', date: '2025-06-03' }
+    ];
+
+    // Render fake entries
+    fakeEntries.forEach(entry => {
+      const div = document.createElement('div');
+      div.className = 'entry';
+      const nameEl = document.createElement('div'); nameEl.className = 'name'; nameEl.textContent = entry.name;
+      const textEl = document.createElement('div'); textEl.className = 'text'; textEl.textContent = entry.text;
+      const dateEl = document.createElement('div'); dateEl.className = 'date'; dateEl.textContent = entry.date;
+      div.appendChild(nameEl); div.appendChild(textEl); div.appendChild(dateEl);
+      entriesEl.appendChild(div);
+    });
+
+    // Sign functionality
+    document.getElementById('sign-btn').addEventListener('click', () => {
+      const name = document.getElementById('sign-name').value.trim();
+      if (!name) return;
+
+      // Create entry with slight delay and altered text
+      const div = document.createElement('div');
+      div.className = 'entry';
+      const nameEl = document.createElement('div'); nameEl.className = 'name'; nameEl.textContent = name;
+      const textEl = document.createElement('div'); textEl.className = 'text'; textEl.textContent = 'Signing...';
+      const dateEl = document.createElement('div'); dateEl.className = 'date'; dateEl.textContent = new Date().toISOString().split('T')[0];
+      div.appendChild(nameEl); div.appendChild(textEl); div.appendChild(dateEl);
+      entriesEl.appendChild(div);
+
+      // Alter after 2 seconds
+      setTimeout(() => {
+        let alteredName = name.replace(/I/g, 'We');
+        const alteredTexts = [
+          `The room says: ${name} has arrived.`,
+          `${name} is now part of the record.`,
+          `Welcome, ${name}. The room was expecting you.`
+        ];
+        div.classList.add('altered');
+        div.querySelector('.name').textContent = alteredName;
+        div.querySelector('.text').textContent = alteredTexts[Math.floor(Math.random() * alteredTexts.length)];
+      }, 2000);
+
+      progress.guestbookSigned = true;
+      FocusRoom.saveProgress(progress);
+      document.getElementById('sign-name').value = '';
+    });
+  </script>
+</body>
+</html>

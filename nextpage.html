@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Focus Room - Next Page</title>
+<meta name="description" content="Are you ready for assessment?">
+<meta name="theme-color" content="#111111">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="shared.css">
 <style>
   body {
     margin: 0;
@@ -40,6 +44,7 @@
 
 <button id="tricky-btn">Continue</button>
 
+<script src="shared.js"></script>
 <script>
 const btn = document.getElementById('tricky-btn');
 const labels = ["Keep Trying", "Not Yet", "Almost..."];
@@ -50,7 +55,7 @@ let btnY = window.innerHeight / 2 - btn.offsetHeight / 2;
 btn.style.left = btnX + 'px';
 btn.style.top = btnY + 'px';
 
-document.addEventListener('mousemove', (e) => {
+let dodgeHandler = (e) => {
   const rect = btn.getBoundingClientRect();
   const mouseX = e.clientX;
   const mouseY = e.clientY;
@@ -61,8 +66,10 @@ document.addEventListener('mousemove', (e) => {
 
   if(distance < 120){ // adjust how close before it moves
     // move button away from cursor
-    btnX -= distX / Math.abs(distX) * 50;
-    btnY -= distY / Math.abs(distY) * 50;
+    const signX = distX === 0 ? 1 : Math.sign(distX);
+    const signY = distY === 0 ? 1 : Math.sign(distY);
+    btnX -= signX * 50;
+    btnY -= signY * 50;
 
     // keep inside viewport
     btnX = Math.max(0, Math.min(window.innerWidth - rect.width, btnX));
@@ -71,7 +78,8 @@ document.addEventListener('mousemove', (e) => {
     btn.style.left = btnX + 'px';
     btn.style.top = btnY + 'px';
   }
-});
+};
+document.addEventListener('mousemove', dodgeHandler);
 
 // Change label randomly on hover
 btn.addEventListener('mouseenter', () => {
@@ -87,8 +95,17 @@ btn.addEventListener('click', () => {
   // Replace 'game.html' with the actual URL or relative path to your game
   window.location.href = 'form.html';
 });
+
+// Mobile: button becomes clickable after 3 seconds
+if ('ontouchstart' in window) {
+  setTimeout(() => {
+    document.removeEventListener('mousemove', dodgeHandler);
+    dodgeHandler = null;
+    btn.style.position = 'static';
+    btn.textContent = 'Continue';
+  }, 3000);
+}
 </script>
 
 </body>
 </html>
-

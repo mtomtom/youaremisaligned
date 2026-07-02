@@ -1,0 +1,126 @@
+/* ===== shared.css — The Focus Room ===== */
+
+/* Cursor trail particles */
+.cursor-trail {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(0, 172, 237, 0.4);
+  pointer-events: none;
+  z-index: 99999;
+  animation: trailFade 0.5s ease-out forwards;
+}
+
+@keyframes trailFade {
+  from { opacity: 0.4; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.2); }
+}
+
+/* Glitch text effect (shared across pages) */
+@keyframes glitchText {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(2px, -2px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 1px); }
+  100% { transform: translate(0); }
+}
+
+.glitch-text {
+  animation: glitchText 0.3s ease infinite;
+}
+
+/* Shared footer visitor counter */
+#visitor-counter {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 0.5rem;
+  font-family: 'Courier New', monospace;
+}
+
+/* Hidden footer links (konami code unlocks) */
+#hidden-footer-links {
+  margin-top: 0.5rem;
+  font-size: 0.7rem;
+}
+
+#hidden-footer-links a {
+  color: #333;
+  text-decoration: none;
+  margin: 0 0.5rem;
+  transition: color 0.3s;
+}
+
+#hidden-footer-links a:hover {
+  color: #00aced;
+}
+
+/* Return visitor banner */
+.return-banner {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.85);
+  color: #00aced;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  z-index: 9999;
+  animation: bannerFade 4s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes bannerFade {
+  0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  85% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Shared nav/footer for non-index pages */
+.shared-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 3%;
+  background: rgba(0,0,0,0.8);
+  z-index: 1000;
+}
+
+.shared-nav .logo {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  text-decoration: none;
+}
+
+.shared-nav .nav-links a {
+  color: #ccc;
+  text-decoration: none;
+  margin-left: 1.5rem;
+  font-size: 0.9rem;
+  transition: color 0.3s;
+}
+
+.shared-nav .nav-links a:hover {
+  color: #00aced;
+}
+
+.shared-footer {
+  text-align: center;
+  padding: 2rem;
+  background: #111;
+  color: #666;
+  font-size: 0.8rem;
+}
+
+/* Mobile: disable cursor trail on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .cursor-trail { display: none !important; }
+}

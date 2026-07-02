@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Optimal Self-Actualization Portal</title>
+    <meta name="description" content="Complete your wellness protocol assessment.">
+    <meta name="theme-color" content="#f9fbfb">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="shared.css">
     <style>
         :root {
             --wellness-white: #f9fbfb;
@@ -96,10 +100,25 @@
 
 <div id="sentinel"></div>
 
+<div id="submit-area" style="text-align:center; margin-top:2rem; display:none;">
+  <button id="submit-btn" style="padding:1rem 2rem; background:#0077cc; color:#fff; border:none; border-radius:6px; font-size:1.1rem; cursor:pointer; transition: background 0.3s;">
+    Submit Assessment
+  </button>
+  <br><br>
+  <a href="results.html" style="color:#999; font-size:0.8rem; text-decoration:none;">
+    I've changed my mind — skip to results
+  </a>
+</div>
+
+<script src="shared.js"></script>
 <script>
     const container = document.getElementById('form-container');
     const sentinel = document.getElementById('sentinel');
     let fieldCount = 0;
+    const progress = FocusRoom.getProgress();
+    let completedFields = progress.formFieldsCompleted || 0;
+    const countedInputs = new Set();
+    let submitScrolled = false;
 
     const prompts = {
         low: ["Full Legal Name", "Email for Soul-Sync", "Residential Geometry", "Preferred Wake-Up Vibration"],
@@ -132,22 +151,45 @@
         const input = document.createElement('input');
         input.type = 'text';
         input.placeholder = "...";
+        input.dataset.fieldIndex = fieldCount;
 
         const status = document.createElement('div');
         status.className = 'status-msg';
 
+        // Return visitor: reference past answers
+        if (fieldCount === 1 && progress.totalVisits > 1) {
+            const lastAnswer = progress.formResponses?.[0]?.value || '...';
+            label.innerText = `Last visit, you answered "${lastAnswer}" — has this changed?`;
+        }
+
         // Add subtle uncanny effects as user types
         input.addEventListener('input', (e) => {
             if (fieldCount > 8) {
+                const isMobile = 'ontouchstart' in window;
                 const blurVal = e.target.value.length / 5;
-                input.style.filter = `blur(${Math.min(blurVal, 2)}px)`;
-                label.style.letterSpacing = `${e.target.value.length}px`;
+                const maxBlur = isMobile ? 0.5 : 2;
+                input.style.filter = `blur(${Math.min(blurVal, maxBlur)}px)`;
+                const maxSpacing = isMobile ? 0 : 15;
+                label.style.letterSpacing = isMobile ? '0px' : `${Math.min(e.target.value.length, maxSpacing)}px`;
             }
             
             if (Math.random() > 0.8) {
                 status.innerText = statusMessages[Math.floor(Math.random() * statusMessages.length)];
                 status.style.opacity = 1;
                 setTimeout(() => { status.style.opacity = 0; }, 2000);
+            }
+        });
+
+        // Track completion on blur (only count each field once)
+        input.addEventListener('blur', () => {
+            const idx = parseInt(input.dataset.fieldIndex);
+            if (input.value.trim() && !countedInputs.has(idx)) {
+                countedInputs.add(idx);
+                completedFields++;
+                progress.formFieldsCompleted = completedFields;
+                progress.formResponses.push({ field: text, value: input.value.trim() });
+                FocusRoom.saveProgress(progress);
+                checkSubmitVisibility();
             }
         });
 
@@ -174,6 +216,7 @@
             for(let i=0; i<3; i++) {
                 createField();
             }
+            checkSubmitVisibility();
         }
     }, { threshold: 1.0 });
 
@@ -182,6 +225,32 @@
     // Initial fields
     for(let i=0; i<4; i++) createField();
 
+    // Show submit button after 20 completed fields
+    function checkSubmitVisibility() {
+        const submitArea = document.getElementById('submit-area');
+        if (completedFields >= 20 && submitArea) {
+            submitArea.style.display = 'block';
+            if (!submitScrolled) {
+                submitScrolled = true;
+                submitArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    }
+
+    // Submit button handler
+    const submitBtn = document.getElementById('submit-btn');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', () => {
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.disabled = true;
+            // Update progress with actual completed count
+            progress.formFieldsCompleted = completedFields;
+            FocusRoom.saveProgress(progress);
+            setTimeout(() => {
+                window.location.href = 'game.html';
+            }, 1500);
+        });
+    }
 </script>
 </body>
 </html>
