@@ -228,12 +228,23 @@
         });
     }
 
+    // Maximum number of fields the room will ever ask for
+    const MAX_FIELDS = 30;
+
     // Intersection Observer to detect when user reaches the bottom
     const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting) {
-            // Generate 3 new fields every time we reach the bottom
+            // Generate 3 new fields, but stop at the max
+            let generated = 0;
             for(let i=0; i<3; i++) {
+                if (fieldCount >= MAX_FIELDS) break;
                 createField();
+                generated++;
+            }
+            // If we hit the max, the room decides you've provided enough
+            if (fieldCount >= MAX_FIELDS) {
+                observer.disconnect();
+                showRoomVerdict();
             }
             checkSubmitVisibility();
         }
@@ -269,6 +280,26 @@
                 window.location.href = 'game.html';
             }, 1500);
         });
+    }
+
+    // When the room has collected enough data, it decides for you
+    function showRoomVerdict() {
+        const verdict = document.createElement('div');
+        verdict.style.cssText = 'text-align:center; margin-top:3rem; padding:2rem; background:#e8f4e8; border-radius:8px; max-width:500px; width:100%; animation: fadeIn 1s ease;';
+        verdict.innerHTML = `
+            <h2 style="font-weight:200; letter-spacing:2px; text-transform:uppercase; color:#2d7d2d;">Assessment Complete</h2>
+            <p style="color:#555; font-style:italic;">The room has collected enough data. Your assessment is complete.</p>
+            <p style="color:#999; font-size:0.85rem;">You may proceed to the Focus Room now.</p>
+        `;
+        container.appendChild(verdict);
+        verdict.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Auto-redirect after a pause
+        setTimeout(() => {
+            progress.formFieldsCompleted = completedFields;
+            FocusRoom.saveProgress(progress);
+            window.location.href = 'game.html';
+        }, 3000);
     }
 </script>
 </body>

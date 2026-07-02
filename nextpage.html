@@ -31,12 +31,21 @@
     border-radius: 8px;
     cursor: pointer;
     position: absolute;
-    transition: transform 0.2s;
+    transition: left 0.25s ease-out, top 0.25s ease-out, transform 0.2s;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
   }
 
   /* Shrink slightly on hover */
   #tricky-btn:hover {
-    transform: scale(0.8);
+    transform: scale(0.95);
+  }
+
+  /* Resigned state — button gives up */
+  #tricky-btn.resigned {
+    background: #555 !important;
+    box-shadow: none !important;
+    pointer-events: auto !important;
   }
 </style>
 </head>
@@ -69,12 +78,17 @@ const btn = document.getElementById('tricky-btn');
 const labels = ["Keep Trying", "Not Yet", "Almost..."];
 
 let btnX = window.innerWidth / 2 - btn.offsetWidth / 2;
-let btnY = window.innerHeight / 2 - btn.offsetHeight / 2;
+let btnY = Math.max(100, window.innerHeight / 2 - btn.offsetHeight / 2); // keep below nav
 
 btn.style.left = btnX + 'px';
 btn.style.top = btnY + 'px';
 
+let dodgeCount = 0;
+let resigned = false;
+
 let dodgeHandler = (e) => {
+  if (resigned) return;
+
   const rect = btn.getBoundingClientRect();
   const mouseX = e.clientX;
   const mouseY = e.clientY;
@@ -83,16 +97,32 @@ let dodgeHandler = (e) => {
   const distY = mouseY - (rect.top + rect.height / 2);
   const distance = Math.sqrt(distX*distX + distY*distY);
 
-  if(distance < 120){ // adjust how close before it moves
-    // move button away from cursor
+  if(distance < 80){ // reduced from 120 — easier to catch
+    dodgeCount++;
+
+    // After 8 dodges, the button gives up (uncanny — it's tired of running)
+    if (dodgeCount >= 8) {
+      resigned = true;
+      btn.classList.add('resigned');
+      btn.textContent = "...fine. Go ahead.";
+      // Snap to center-bottom area, away from nav
+      btnX = window.innerWidth / 2 - btn.offsetWidth / 2;
+      btnY = Math.max(120, window.innerHeight - 200);
+      btn.style.left = btnX + 'px';
+      btn.style.top = btnY + 'px';
+      document.removeEventListener('mousemove', dodgeHandler);
+      return;
+    }
+
+    // move button away from cursor — reduced movement
     const signX = distX === 0 ? 1 : Math.sign(distX);
     const signY = distY === 0 ? 1 : Math.sign(distY);
-    btnX -= signX * 50;
-    btnY -= signY * 50;
+    btnX -= signX * 35;
+    btnY -= signY * 35;
 
-    // keep inside viewport
-    btnX = Math.max(0, Math.min(window.innerWidth - rect.width, btnX));
-    btnY = Math.max(0, Math.min(window.innerHeight - rect.height, btnY));
+    // keep inside viewport, but never near the nav (keep at least 80px below it)
+    btnX = Math.max(10, Math.min(window.innerWidth - rect.width - 10, btnX));
+    btnY = Math.max(90, Math.min(window.innerHeight - rect.height - 60, btnY));
 
     btn.style.left = btnX + 'px';
     btn.style.top = btnY + 'px';
