@@ -9,6 +9,8 @@ const progress = FocusRoom.getProgress();
 // HUD element references
 const roomCounterEl = document.getElementById('room-counter');
 const inputCounterEl = document.getElementById('input-counter');
+const fpCounterEl = document.getElementById('fp-counter');
+const alignCounterEl = document.getElementById('align-counter');
 const exitHintEl = document.getElementById('exit-hint');
 const containerEl = document.getElementById('container');
 
@@ -70,15 +72,9 @@ for (let i = 1; i <= totalImages; i++) {
 setTimeout(() => {
   if (imagesLoaded < totalImages) {
     console.warn('Images failed to load, using fallback background');
-    drawRoom(null, 'normal');
+    drawRoom(roomImages[0], 'normal');
   }
 }, 5000);
-
-// Fallback: if no images loaded, draw colored rect
-canvas.addEventListener('error', () => {
-  ctx.fillStyle = '#1a1a1a';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-});
 
 // ==========================
 // GAME STATE
@@ -91,22 +87,51 @@ let scaryProb = 0.05;
 const scaryIncrement = 0.02;
 const scaryMax = 0.6;
 let lastQuestion = "";
-let scaryCooldown = 0; // inputs between scary triggers (phase 3)
-let currentRoom = 0; // tracks which room image index is displayed
-let exitHintShown = false; // prevents race condition with updateHUD timing
+let scaryCooldown = 0;
+let currentRoom = 0;
+let exitHintShown = false;
+
+// Scoring state
+let focusPoints = progress.focusPoints || 0;
+let roomsCompleted = progress.roomsCompleted || 0;
+const totalRooms = 10;
+const WIN_ALIGNMENT = 70;
+let gameEnded = false;
+let gameWon = false;
+
 const nonScaryIndices = roomImages.map((_, i) => i).filter(i => !scaryImages.includes(i));
 
 // ==========================
 // HUD & FEEDBACK
 // ==========================
+function calculateAlignment() {
+  const total = (progress.calmCount || 0) + (progress.fearCount || 0);
+  if (total === 0) return 100; // neutral answers = no fear = aligned
+  return ((progress.calmCount || 0) / total) * 100;
+}
+
 function updateHUD() {
   // Update room counter
   if (roomCounterEl) {
-    roomCounterEl.textContent = String(currentRoom + 1);
+    roomCounterEl.textContent = String(Math.min(roomsCompleted + 1, totalRooms));
   }
   // Update input counter
   if (inputCounterEl) {
     inputCounterEl.textContent = String(inputCount);
+  }
+  // Update focus points
+  if (fpCounterEl) {
+    fpCounterEl.textContent = String(focusPoints);
+  }
+  // Update alignment
+  if (alignCounterEl) {
+    const total = (progress.calmCount || 0) + (progress.fearCount || 0);
+    if (total === 0) {
+      alignCounterEl.textContent = '--';
+    } else {
+      const alignment = calculateAlignment();
+      alignCounterEl.textContent = Math.round(alignment) + '%';
+    }
   }
   // Update phase dots
   for (let i = 1; i <= 3; i++) {
@@ -140,11 +165,25 @@ function flashInputFeedback(type) {
 const leaveBtn = document.getElementById('leave-room-btn');
 if (leaveBtn) {
   leaveBtn.addEventListener('click', (e) => {
-    if (inputCount < 8) {
+    if (gameEnded) {
+      if (gameWon) {
+        // Allow navigation — game is over, player earned the exit
+        return;
+      } else {
+        e.preventDefault();
+        showTextOnCanvas("You can't leave. The room keeps you now.");
+        leaveBtn.style.borderColor = '#ff4444';
+        leaveBtn.style.color = '#ff4444';
+        setTimeout(() => {
+          leaveBtn.style.borderColor = '';
+          leaveBtn.style.color = '';
+        }, 1500);
+        return;
+      }
+    }
+    if (roomsCompleted < 8) {
       e.preventDefault();
-      // Show a message on canvas instead of leaving
       showTextOnCanvas("The room is not finished with you yet. Keep going.");
-      // Flash the button briefly
       leaveBtn.style.borderColor = '#ff4444';
       leaveBtn.style.color = '#ff4444';
       setTimeout(() => {
@@ -152,7 +191,6 @@ if (leaveBtn) {
         leaveBtn.style.color = '';
       }, 1500);
     }
-    // After 8+ inputs, the default <a> href="results.html" works naturally
   });
 }
 
@@ -211,6 +249,24 @@ function handleUserInput() {
   const text = input.value.trim();
   if (!text) return;
 
+  // If game has ended, only "exit" works (and even then, only if won)
+  if (gameEnded) {
+    if (text.toLowerCase() === 'exit' && gameWon) {
+      showTextOnCanvas("The room releases you. For now.");
+      input.value = "";
+      setTimeout(() => {
+        window.location.href = 'results.html';
+      }, 1500);
+    } else if (text.toLowerCase() === 'exit') {
+      showTextOnCanvas("There is no exit. There was never an exit.");
+      input.value = "";
+    } else {
+      showTextOnCanvas("The walls don't respond. Nothing matters here anymore.");
+      input.value = "";
+    }
+    return;
+  }
+
   // Increment input count for this input
   inputCount++;
 
@@ -226,6 +282,10 @@ function handleUserInput() {
   if (inputCount >= 15 && text.toLowerCase() === 'exit') {
     showTextOnCanvas("The room releases you. For now.");
     input.value = "";
+    // Save alignment before exiting
+    progress.finalAlignment = Math.round(calculateAlignment());
+    progress.roomsCompleted = roomsCompleted;
+    FocusRoom.saveProgress(progress);
     setTimeout(() => {
       window.location.href = 'results.html';
     }, 1500);
@@ -246,6 +306,12 @@ input.addEventListener("keydown", (e) => {
     handleUserInput();
   }
 });
+
+// Touch support: tap canvas to focus input
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  input.focus();
+}, { passive: false });
 
 // ==========================
 // TEXT ON CANVAS
@@ -317,18 +383,18 @@ function askQuestion() {
 // REACT TO INPUT (MAIN LOGIC)
 // ==========================
 function reactToInput(text) {
-  if (!text) return;
+  if (!text || gameEnded) return;
 
-  // If returning visitor, start at higher phase (inputCount is 1 on first call)
-  if (inputCount === 1 && progress.totalVisits > 2) {
+  // If returning visitor, start at higher phase (roomsCompleted is 1 on first call)
+  if (roomsCompleted === 1 && progress.totalVisits > 2) {
     currentPhase = Math.min(2, currentPhase + 1);
   }
 
-  // Determine phase based on input count
+  // Determine phase based on room completion
   const oldPhase = currentPhase;
-  if (inputCount >= 9 && currentPhase < 3) {
+  if (roomsCompleted >= 8 && currentPhase < 3) {
     currentPhase = 3;
-  } else if (inputCount >= 6 && currentPhase < 2) {
+  } else if (roomsCompleted >= 4 && currentPhase < 2) {
     currentPhase = 2;
   }
   // Fire phase transition effect
@@ -346,7 +412,21 @@ function reactToInput(text) {
   // Update counts
   if (reaction === 'fear') progress.fearCount++;
   if (reaction === 'calm') progress.calmCount++;
+
+  // Update focus points
+  if (reaction === 'calm') {
+    focusPoints += 10;
+  } else if (reaction === 'fear') {
+    focusPoints = Math.max(0, focusPoints - 5);
+  } else {
+    focusPoints += 2;
+  }
+
+  progress.focusPoints = focusPoints;
   FocusRoom.saveProgress(progress);
+
+  // Track room completion
+  roomsCompleted++;
 
   // Phase-specific effects
   const phaseEffect = currentPhase >= 3 ? 'distort' : currentPhase >= 2 ? 'dim' : 'normal';
@@ -369,7 +449,7 @@ function reactToInput(text) {
     triggerScary = canShowScary && Math.random() < Math.min(scaryProb + 0.1, 0.4);
   } else {
     // Phase 3: high probability but with 3-input cooldown
-    triggerScary = canShowScary && scaryCooldown === 0 && Math.random() < 0.5;
+    triggerScary = canShowScary && scaryCooldown === 0 && Math.random() < scaryProb;
   }
 
   // Fear reaction always triggers scary if available
@@ -381,8 +461,6 @@ function reactToInput(text) {
   if (scaryCooldown > 0) {
     scaryCooldown--;
   }
-
-  // nonScaryIndices precomputed at init
 
   if (triggerScary && canShowScary) {
     // Show scary image
@@ -400,7 +478,7 @@ function reactToInput(text) {
     }, duration);
 
     scaryStage = (scaryStage + 1) % scaryImages.length;
-    if (currentPhase === 3) scaryCooldown = 3; // inputs between triggers (decrement happens after)
+    if (currentPhase === 3) scaryCooldown = 3;
     scaryProb = 0.05;
   } else {
     // Normal room
@@ -409,7 +487,94 @@ function reactToInput(text) {
     askQuestion();
     scaryProb = Math.min(scaryProb + scaryIncrement, scaryMax);
   }
+
+  // Check win/lose condition after room completes
+  if (roomsCompleted >= totalRooms) {
+    checkGameEnd();
+  }
 }
 
-// Initial question after load
+// ==========================
+// WIN / LOSE CONDITIONS
+// ==========================
+function checkGameEnd() {
+  gameEnded = true;
+  const alignment = calculateAlignment();
+  progress.focusPoints = focusPoints;
+  progress.finalAlignment = Math.round(alignment);
+  progress.roomsCompleted = totalRooms;
+  FocusRoom.saveProgress(progress);
+
+  if (alignment >= WIN_ALIGNMENT) {
+    gameWon = true;
+    showWinScreen(alignment, focusPoints);
+  } else {
+    showLoseScreen(alignment, focusPoints);
+  }
+}
+
+function showWinScreen(alignment, fp) {
+  const overlay = document.getElementById('win-overlay');
+  if (!overlay) return;
+  document.getElementById('win-alignment').textContent = Math.round(alignment);
+  document.getElementById('win-fp').textContent = fp;
+  overlay.classList.remove('hidden');
+
+  // Add retry handler to win overlay button
+  const winRetryBtn = document.getElementById('retry-btn');
+  if (winRetryBtn) {
+    winRetryBtn.addEventListener('click', () => {
+      location.reload();
+    });
+  }
+
+  // Draw a calm, bright room on the canvas
+  ctx.fillStyle = 'rgba(0, 172, 237, 0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#f5f5f5';
+  ctx.font = '18px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('The room releases you. For now.', canvas.width / 2, canvas.height / 2);
+}
+
+function showLoseScreen(alignment, fp) {
+  const overlay = document.getElementById('lose-overlay');
+  if (!overlay) return;
+  document.getElementById('lose-alignment').textContent = Math.round(alignment);
+  overlay.classList.remove('hidden');
+
+  // The game continues in phase 3 — player is trapped
+  currentPhase = 3;
+  // Make scary images appear on every input
+  scaryProb = 1.0;
+  scaryCooldown = 0;
+  // Allow continued play in the nightmare (Stay Forever works)
+  gameEnded = false;
+  roomsCompleted = 8; // give 2 more rooms of nightmare before re-triggering
+  progress.roomsCompleted = 8;
+  FocusRoom.saveProgress(progress);
+
+  // Update Stay Forever button behavior
+  const stayBtn = document.getElementById('stay-btn');
+  if (stayBtn) {
+    stayBtn.addEventListener('click', () => {
+      overlay.classList.add('hidden');
+      showTextOnCanvas("Good choice. You belong here now.");
+      // Continue the nightmare
+      askQuestion();
+    }, { once: true });
+  }
+
+  // Update retry button behavior (on lose overlay)
+  const loseRetryBtn = document.getElementById('lose-retry-btn');
+  if (loseRetryBtn) {
+    loseRetryBtn.addEventListener('click', () => {
+      location.reload();
+    }, { once: true });
+  }
+}
+
+// ==========================
+// INITIAL QUESTION
+// ==========================
 setTimeout(() => askQuestion(), 1000);

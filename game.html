@@ -41,8 +41,12 @@
         </div>
       </div>
       <div class="hud-item">
-        <span class="hud-label">Inputs</span>
-        <span class="hud-value" id="input-counter">0</span>
+        <span class="hud-label">FP</span>
+        <span class="hud-value" id="fp-counter">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Align</span>
+        <span class="hud-value" id="align-counter">--</span>
       </div>
     </div>
 
@@ -57,6 +61,34 @@
     <p class="exit-hint" id="exit-hint">type "exit" to leave the room</p>
 
     <a href="results.html" class="leave-room-btn" id="leave-room-btn">Leave Room</a>
+  </div>
+
+  <!-- Win overlay -->
+  <div id="win-overlay" class="game-overlay hidden">
+    <div class="overlay-content">
+      <h2>YOU ESCAPED THE ROOM.</h2>
+      <p>Final Alignment: <span id="win-alignment">--</span>%</p>
+      <p>Focus Points: <span id="win-fp">--</span></p>
+      <p class="win-message">The room releases you. For now.</p>
+      <div class="overlay-buttons">
+        <a href="results.html" class="overlay-btn">View Results</a>
+        <button class="overlay-btn" id="retry-btn">Try Again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lose overlay -->
+  <div id="lose-overlay" class="game-overlay hidden">
+    <div class="overlay-content">
+      <h2>THE ROOM KEEPS YOU.</h2>
+      <p>Alignment insufficient: <span id="lose-alignment">--</span>%</p>
+      <p>Phase 3 is permanent.</p>
+      <p class="lose-message">There is no exit.<br>There was never an exit.</p>
+      <div class="overlay-buttons">
+        <button class="overlay-btn" id="stay-btn">Stay Forever</button>
+        <button class="overlay-btn" id="lose-retry-btn">Try Again</button>
+      </div>
+    </div>
   </div>
 
   <footer class="shared-footer">
