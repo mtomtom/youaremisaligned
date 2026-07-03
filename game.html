@@ -26,6 +26,26 @@
   </nav>
 
   <div id="container">
+    <!-- HUD: Room counter, phase dots, input count -->
+    <div class="game-hud">
+      <div class="hud-item">
+        <span class="hud-label">Room</span>
+        <span class="hud-value" id="room-counter">1</span>
+        <span class="hud-label">/ 10</span>
+      </div>
+      <div class="hud-item">
+        <div class="phase-dots">
+          <span class="phase-dot active" id="phase-dot-1"></span>
+          <span class="phase-dot" id="phase-dot-2"></span>
+          <span class="phase-dot" id="phase-dot-3"></span>
+        </div>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Inputs</span>
+        <span class="hud-value" id="input-counter">0</span>
+      </div>
+    </div>
+
     <canvas id="roomCanvas" width="800" height="600"></canvas>
 
     <input
@@ -34,6 +54,9 @@
       placeholder="type something"
       autocomplete="off"
     />
+    <p class="exit-hint" id="exit-hint">type "exit" to leave the room</p>
+
+    <a href="results.html" class="leave-room-btn" id="leave-room-btn">Leave Room</a>
   </div>
 
   <footer class="shared-footer">

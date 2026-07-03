@@ -124,3 +124,39 @@
 @media (hover: none) and (pointer: coarse) {
   .cursor-trail { display: none !important; }
 }
+
+/* Archive nav link — injected by shared.js */
+.shared-nav .nav-links a[href="videos.html"],
+nav .tabs a[href="videos.html"] {
+  color: #888;
+  font-style: italic;
+}
+
+.shared-nav .nav-links a[href="videos.html"]:hover,
+nav .tabs a[href="videos.html"]:hover {
+  color: #00ff00;
+}
+
+/* Dim current-page nav link */
+.shared-nav .nav-links a.current-page,
+nav .tabs a.current-page {
+  color: #444 !important;
+  cursor: default;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Void link in footer — subtle, always-present */
+.void-link {
+  color: #1e1e1e !important;
+  text-decoration: none;
+  font-size: 0.65rem;
+  opacity: 0.3;
+  transition: opacity 0.5s ease, color 0.5s ease;
+  letter-spacing: 0.15em;
+}
+
+.void-link:hover {
+  opacity: 1 !important;
+  color: #555 !important;
+}

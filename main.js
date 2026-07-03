@@ -6,6 +6,12 @@ const ctx = canvas.getContext("2d");
 const input = document.getElementById("inputBox");
 const progress = FocusRoom.getProgress();
 
+// HUD element references
+const roomCounterEl = document.getElementById('room-counter');
+const inputCounterEl = document.getElementById('input-counter');
+const exitHintEl = document.getElementById('exit-hint');
+const containerEl = document.getElementById('container');
+
 // ==========================
 // LOAD ROOM IMAGES
 // ==========================
@@ -86,43 +92,116 @@ const scaryIncrement = 0.02;
 const scaryMax = 0.6;
 let lastQuestion = "";
 let scaryCooldown = 0; // inputs between scary triggers (phase 3)
+let currentRoom = 0; // tracks which room image index is displayed
+let exitHintShown = false; // prevents race condition with updateHUD timing
 const nonScaryIndices = roomImages.map((_, i) => i).filter(i => !scaryImages.includes(i));
+
+// ==========================
+// HUD & FEEDBACK
+// ==========================
+function updateHUD() {
+  // Update room counter
+  if (roomCounterEl) {
+    roomCounterEl.textContent = String(currentRoom + 1);
+  }
+  // Update input counter
+  if (inputCounterEl) {
+    inputCounterEl.textContent = String(inputCount);
+  }
+  // Update phase dots
+  for (let i = 1; i <= 3; i++) {
+    const dot = document.getElementById('phase-dot-' + i);
+    if (!dot) continue;
+    dot.classList.remove('active', 'completed');
+    if (i < currentPhase) dot.classList.add('completed');
+    else if (i === currentPhase) dot.classList.add('active');
+  }
+  // Show exit hint after 5 inputs (use flag to avoid race condition)
+  if (exitHintEl && inputCount >= 5 && !exitHintShown) {
+    exitHintEl.classList.add('visible');
+    exitHintShown = true;
+  }
+}
+
+function showPhaseFlash(phase) {
+  const flash = document.createElement('div');
+  flash.className = 'phase-flash-overlay phase-' + phase + '-flash';
+  containerEl.appendChild(flash);
+  setTimeout(() => flash.remove(), 900);
+}
+
+function flashInputFeedback(type) {
+  const cls = 'feedback-' + type;
+  input.classList.add(cls);
+  setTimeout(() => input.classList.remove(cls), 1200);
+}
+
+// Leave Room button: show confirmation after 8+ inputs
+const leaveBtn = document.getElementById('leave-room-btn');
+if (leaveBtn) {
+  leaveBtn.addEventListener('click', (e) => {
+    if (inputCount < 8) {
+      e.preventDefault();
+      // Show a message on canvas instead of leaving
+      showTextOnCanvas("The room is not finished with you yet. Keep going.");
+      // Flash the button briefly
+      leaveBtn.style.borderColor = '#ff4444';
+      leaveBtn.style.color = '#ff4444';
+      setTimeout(() => {
+        leaveBtn.style.borderColor = '';
+        leaveBtn.style.color = '';
+      }, 1500);
+    }
+    // After 8+ inputs, the default <a> href="results.html" works naturally
+  });
+}
 
 // ==========================
 // DRAW FUNCTION
 // ==========================
 function drawRoom(image, effect) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (image && image.complete && image.naturalWidth > 0) {
-    // Phase effects
-    if (effect === 'dim') {
-      ctx.filter = 'brightness(0.6) contrast(1.2)';
-    } else if (effect === 'distort') {
-      ctx.filter = 'brightness(0.4) contrast(1.5) saturate(0.3)';
-    } else {
-      ctx.filter = 'none';
-    }
-    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    ctx.filter = 'none';
-
-    // Phase 3: add glitch overlay
-    if (effect === 'distort') {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-      for (let i = 0; i < 5; i++) {
-        const y = Math.random() * canvas.height;
-        const h = Math.random() * 20 + 5;
-        ctx.fillRect(0, y, canvas.width, h);
-      }
-    }
-  } else {
-    // Fallback colored background
-    ctx.fillStyle = '#1a1a1a';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#666';
-    ctx.font = '20px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('The room is loading...', canvas.width / 2, canvas.height / 2);
+  // Track current room index
+  if (image && roomImages.indexOf(image) !== -1) {
+    currentRoom = roomImages.indexOf(image);
   }
+
+  // Fade transition
+  canvas.classList.add('fading');
+  setTimeout(() => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (image && image.complete && image.naturalWidth > 0) {
+      // Phase effects
+      if (effect === 'dim') {
+        ctx.filter = 'brightness(0.6) contrast(1.2)';
+      } else if (effect === 'distort') {
+        ctx.filter = 'brightness(0.4) contrast(1.5) saturate(0.3)';
+      } else {
+        ctx.filter = 'none';
+      }
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      ctx.filter = 'none';
+
+      // Phase 3: add glitch overlay
+      if (effect === 'distort') {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        for (let i = 0; i < 5; i++) {
+          const y = Math.random() * canvas.height;
+          const h = Math.random() * 20 + 5;
+          ctx.fillRect(0, y, canvas.width, h);
+        }
+      }
+    } else {
+      // Fallback colored background
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#666';
+      ctx.font = '20px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('The room is loading...', canvas.width / 2, canvas.height / 2);
+    }
+    canvas.classList.remove('fading');
+    updateHUD();
+  }, 200);
 }
 
 // ==========================
@@ -246,13 +325,23 @@ function reactToInput(text) {
   }
 
   // Determine phase based on input count
+  const oldPhase = currentPhase;
   if (inputCount >= 9 && currentPhase < 3) {
     currentPhase = 3;
   } else if (inputCount >= 6 && currentPhase < 2) {
     currentPhase = 2;
   }
+  // Fire phase transition effect
+  if (currentPhase !== oldPhase) {
+    showPhaseFlash(currentPhase);
+  }
 
   const reaction = interpretAnswer(text);
+
+  // Visual feedback on input box based on sentiment
+  if (reaction === 'fear' || reaction === 'calm') {
+    flashInputFeedback(reaction);
+  }
 
   // Update counts
   if (reaction === 'fear') progress.fearCount++;

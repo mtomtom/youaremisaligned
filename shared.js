@@ -212,16 +212,75 @@
     }
   }
 
-  // Run counter update
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      updateVisitorCounter();
-      // Restore Konami unlock if previously earned
-      if (loadProgress().konamiUnlocked) showVoidLink();
+  // ========== Inject "Archive" link into navigation ==========
+  function injectArchiveLink() {
+    // Try shared-nav first
+    const navLinks = document.querySelector('.shared-nav .nav-links');
+    if (navLinks) {
+      const sessionsLink = navLinks.querySelector('a[href="game.html"]');
+      if (sessionsLink && !navLinks.querySelector('a[href="videos.html"]')) {
+        const archiveLink = document.createElement('a');
+        archiveLink.href = 'videos.html';
+        archiveLink.textContent = 'Archive';
+        sessionsLink.parentNode.insertBefore(archiveLink, sessionsLink.nextSibling);
+      }
+      return;
+    }
+    // Fallback: index.html custom nav
+    const tabs = document.querySelector('nav .tabs');
+    if (tabs) {
+      const sessionsLink = tabs.querySelector('a[href="game.html"]');
+      if (sessionsLink && !tabs.querySelector('a[href="videos.html"]')) {
+        const archiveLink = document.createElement('a');
+        archiveLink.href = 'videos.html';
+        archiveLink.textContent = 'Archive';
+        sessionsLink.parentNode.insertBefore(archiveLink, sessionsLink.nextSibling);
+      }
+    }
+  }
+
+  // ========== Add subtle void link to footer ==========
+  function injectVoidLink() {
+    const footer = document.querySelector('.shared-footer');
+    if (!footer) return;
+    const container = footer.querySelector('#hidden-footer-links');
+    if (!container) return;
+    const link = document.createElement('a');
+    link.href = 'void.html';
+    link.textContent = '[ void ]';
+    link.className = 'void-link';
+    link.title = 'Forget everything.';
+    container.appendChild(link);
+  }
+
+  // ========== Dim current-page link in nav ==========
+  function dimCurrentNavLink() {
+    const navLinks = document.querySelector('.shared-nav .nav-links')
+      || document.querySelector('nav .tabs');
+    if (!navLinks) return;
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    navLinks.querySelectorAll('a').forEach(a => {
+      if (a.getAttribute('href') === currentPage) {
+        a.classList.add('current-page');
+      }
     });
-  } else {
+  }
+
+  // Run counter update
+  function initSharedPage() {
     updateVisitorCounter();
+    // Restore Konami unlock if previously earned
     if (loadProgress().konamiUnlocked) showVoidLink();
+    // Inject Archive link and void link
+    injectArchiveLink();
+    injectVoidLink();
+    dimCurrentNavLink();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSharedPage);
+  } else {
+    initSharedPage();
   }
 
   // ========== Konami Code ==========
@@ -246,6 +305,8 @@
   function showVoidLink() {
     const container = document.getElementById('hidden-footer-links');
     if (!container) return;
+    // Don't overwrite the always-present void link injected by injectVoidLink()
+    if (container.querySelector('.void-link')) return;
     container.innerHTML = '<a href="void.html">[ void ]</a>';
   }
 

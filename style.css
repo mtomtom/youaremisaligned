@@ -30,8 +30,175 @@ body {
   outline: none;
 }
 
+/* ===== Game HUD ===== */
+.game-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 780px;
+  max-width: 95vw;
+  padding: 10px 0 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: #555;
+  user-select: none;
+}
+
+.hud-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hud-label {
+  color: #444;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+}
+
+.hud-value {
+  color: #00aced;
+  font-weight: bold;
+  font-size: 0.9rem;
+  min-width: 1ch;
+  display: inline-block;
+  text-align: center;
+}
+
+/* Phase indicator dots */
+.phase-dots {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+
+.phase-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  transition: all 0.4s ease;
+}
+
+.phase-dot.active {
+  background: #00aced;
+  border-color: #00aced;
+  box-shadow: 0 0 6px rgba(0, 172, 237, 0.6);
+}
+
+.phase-dot.completed {
+  background: #444;
+  border-color: #666;
+}
+
+/* Leave Room button */
+.leave-room-btn {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 24px;
+  background: transparent;
+  border: 1px solid #2a2a2a;
+  color: #444;
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  text-decoration: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.05em;
+}
+
+.leave-room-btn:hover {
+  border-color: #00aced;
+  color: #00aced;
+  background: rgba(0, 172, 237, 0.04);
+  box-shadow: 0 0 8px rgba(0, 172, 237, 0.15);
+}
+
+/* Exit hint text — fades in after enough inputs */
+.exit-hint {
+  font-size: 0.68rem;
+  color: #333;
+  font-family: 'Courier New', monospace;
+  margin-top: 4px;
+  margin-bottom: 2px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  pointer-events: none;
+}
+
+.exit-hint.visible {
+  opacity: 1;
+}
+
+/* Input feedback glow */
+#inputBox.feedback-fear {
+  border-color: #ff4444 !important;
+  box-shadow: 0 0 10px rgba(255, 68, 68, 0.25);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+#inputBox.feedback-calm {
+  border-color: #44cc44 !important;
+  box-shadow: 0 0 10px rgba(68, 204, 68, 0.25);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Canvas fade for room transitions */
+#roomCanvas {
+  transition: opacity 0.25s ease;
+}
+
+#roomCanvas.fading {
+  opacity: 0.15;
+}
+
+/* Phase transition flash overlay */
+.phase-flash-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+  animation: phaseFlashAnim 0.8s ease-out forwards;
+  border-radius: inherit;
+}
+
+@keyframes phaseFlashAnim {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.phase-flash-overlay.phase-2-flash {
+  background: radial-gradient(ellipse at center, rgba(100, 100, 140, 0.3), transparent 70%);
+}
+
+.phase-flash-overlay.phase-3-flash {
+  background: radial-gradient(ellipse at center, rgba(140, 30, 30, 0.35), transparent 70%);
+}
+
+/* Current-page nav dimming (shared.css has pointer-events: none; this adds opacity) */
+.shared-nav .nav-links a.current-page {
+  color: #444 !important;
+  cursor: default;
+  opacity: 0.5;
+}
+
+.shared-nav .nav-links a.current-page:hover {
+  color: #444 !important;
+}
+
 /* Mobile responsive additions */
 @media (max-width: 850px) {
+  .game-hud {
+    width: 90vw;
+  }
   #roomCanvas {
     width: 100vw !important;
     height: auto !important;
@@ -58,6 +225,17 @@ body {
   }
   .shared-nav .nav-links a {
     margin-left: 0.8rem;
+    font-size: 0.8rem;
+  }
+  .game-hud {
+    width: 95vw;
+    flex-direction: row;
+    font-size: 0.7rem;
+  }
+  .hud-label {
+    font-size: 0.6rem;
+  }
+  .hud-value {
     font-size: 0.8rem;
   }
 }
