@@ -7,6 +7,9 @@
 <meta name="description" content="The Focus Room awaits your assessment. Professional focus alignment and wellness evaluation.">
 <meta property="og:title" content="The Focus Room">
 <meta property="og:description" content="Professional assessment and subtle focus experiences await you.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://youaremisaligned.org/">
+<meta property="og:image" content="https://youaremisaligned.org/og-image.jpg">
 <meta name="theme-color" content="#111111">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="shared.css">
@@ -28,35 +31,11 @@ body, html {
 }
 
 
-/* ===== Top Navigation ===== */
-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 3%;
-  background: rgba(0,0,0,0.6);
-  z-index: 1000;
-}
-
-nav .logo {
-  font-size: 1.8rem;
-  font-weight: bold;
-}
-
-nav .tabs a {
-  color: #fff;
-  text-decoration: none;
-  margin-left: 2rem;
-  font-weight: 500;
-  transition: color 0.3s;
-}
-
-nav .tabs a:hover {
-  color: #00aced;
+/* ===== Top Navigation =====
+   Markup and base styles come from shared.css (.shared-nav);
+   the landing page just gets a slightly larger logo. */
+.shared-nav .logo {
+  font-size: 1.6rem;
 }
 
 /* ===== Hero Section ===== */
@@ -64,7 +43,7 @@ nav .tabs a:hover {
   position: relative;
   z-index: 1;
   min-height: 60vh;
-  background: url('clinic_outside.png') center/cover no-repeat;
+  background: url('clinic_outside.webp') center/cover no-repeat;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -152,11 +131,11 @@ footer {
 
 /* ===== Responsive ===== */
 @media (max-width: 600px) {
-  nav {
+  .shared-nav {
     flex-direction: column;
     align-items: flex-start;
   }
-  nav .tabs {
+  .shared-nav .nav-links {
     margin-top: 0.5rem;
   }
   .overlay-card {
@@ -550,10 +529,10 @@ footer {
 </head>
 <body>
 
-<!-- Navigation -->
-<nav>
-  <div class="logo">The Focus Room</div>
-  <div class="tabs">
+<!-- Navigation (shared markup — see shared.css/shared.js) -->
+<nav class="shared-nav">
+  <a href="index.html" class="logo">The Focus Room</a>
+  <div class="nav-links">
     <a href="index.html">Home</a>
     <a href="game.html">Sessions</a>
     <a href="about.html">About</a>
@@ -567,7 +546,7 @@ footer {
 <!-- Hero Section -->
 <section class="hero" id="hero">
   <div class="overlay-card">
-    <img id="inside-img" src="clinic_inside.png" alt="Inside the clinic">
+    <img id="inside-img" src="clinic_inside.webp" alt="Inside the clinic">
     <div class="text-content">
       <p>Professional assessment and subtle focus experiences await you.</p>
       <a href="#" id="check-alignment" class="cta-button">Check Alignment</a>
@@ -650,7 +629,7 @@ footer {
 </div>
 
 <!-- Footer -->
-<footer>
+<footer class="shared-footer">
   <p>&copy; 2025 The Focus Room. All rights reserved.</p>
   <p id="visitor-counter"></p>
   <div class="focus-room-clock" id="focus-room-clock">--:--:--</div>
@@ -692,8 +671,8 @@ button.addEventListener('click', (e) => {
   if (window.resumeAudio) window.resumeAudio();
 
   // Swap images
-  insideImg.src = 'glitch_clinic_inside.png';
-  heroSection.style.backgroundImage = "url('glitch_clinic_outside.png')";
+  insideImg.src = 'glitch_clinic_inside.webp';
+  heroSection.style.backgroundImage = "url('glitch_clinic_outside.webp')";
   heroSection.classList.add('glitch');
 
   // Overlay card shake
@@ -707,10 +686,13 @@ button.addEventListener('click', (e) => {
 });
 
 // Triple-click logo easter egg → webmaster.html
+// The logo is a link to index.html; on the landing page itself, swallow the
+// navigation so rapid clicks can accumulate instead of reloading the page.
 const logo = document.querySelector('nav .logo');
 let logoClicks = 0;
 let logoClickTimer = null;
-logo.addEventListener('click', () => {
+logo.addEventListener('click', (e) => {
+  e.preventDefault();
   logoClicks++;
   clearTimeout(logoClickTimer);
   logoClickTimer = setTimeout(() => { logoClicks = 0; }, 500);

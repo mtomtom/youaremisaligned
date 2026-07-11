@@ -83,6 +83,14 @@ body {
   color: #00aced;
 }
 
+/* Alignment target hint */
+.hud-value[id="align-counter"]::after {
+  content: '/70';
+  font-size: 0.6rem;
+  color: #444;
+  margin-left: 2px;
+}
+
 /* Phase indicator dots */
 .phase-dots {
   display: flex;
@@ -132,6 +140,21 @@ body {
   color: #00aced;
   background: rgba(0, 172, 237, 0.04);
   box-shadow: 0 0 8px rgba(0, 172, 237, 0.15);
+}
+
+.leave-room-btn.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+  cursor: default;
+}
+
+.leave-room-btn.enabled {
+  opacity: 0.7;
+  transition: opacity 0.5s ease;
+}
+
+.leave-room-btn.enabled:hover {
+  opacity: 1;
 }
 
 /* Exit hint text — fades in after enough inputs */
@@ -192,23 +215,16 @@ body {
   100% { opacity: 0; }
 }
 
+.phase-flash-overlay.phase-1-flash {
+  background: radial-gradient(ellipse at center, rgba(0, 172, 237, 0.15), transparent 70%);
+}
+
 .phase-flash-overlay.phase-2-flash {
   background: radial-gradient(ellipse at center, rgba(100, 100, 140, 0.3), transparent 70%);
 }
 
 .phase-flash-overlay.phase-3-flash {
   background: radial-gradient(ellipse at center, rgba(140, 30, 30, 0.35), transparent 70%);
-}
-
-/* Current-page nav dimming (shared.css has pointer-events: none; this adds opacity) */
-.shared-nav .nav-links a.current-page {
-  color: #444 !important;
-  cursor: default;
-  opacity: 0.5;
-}
-
-.shared-nav .nav-links a.current-page:hover {
-  color: #444 !important;
 }
 
 /* ===== Win / Lose Overlays ===== */
@@ -249,6 +265,48 @@ body {
   letter-spacing: 3px;
   text-transform: uppercase;
   margin-bottom: 1.5rem;
+}
+
+/* Onboarding overlay */
+#onboarding-overlay .overlay-content h2 {
+  color: #00aced;
+  text-shadow: 0 0 20px rgba(0, 172, 237, 0.3);
+  font-size: 1.3rem;
+}
+
+.onboarding-list {
+  text-align: left;
+  color: #999;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.onboarding-list li {
+  padding-left: 1.2em;
+  position: relative;
+}
+
+.onboarding-list li::before {
+  content: '>';
+  position: absolute;
+  left: 0;
+  color: #00aced;
+}
+
+.hud-legend {
+  color: #555;
+  font-size: 0.75rem;
+  font-family: 'Courier New', monospace;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #333;
+}
+
+#begin-btn {
+  margin-top: 1rem;
 }
 
 /* Win overlay styling */

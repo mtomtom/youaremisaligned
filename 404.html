@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Room Not Found — The Focus Room</title>
+  <meta name="description" content="This room does not exist. Yet.">
+  <meta property="og:title" content="Room Not Found — The Focus Room">
+  <meta property="og:description" content="This room does not exist. Yet.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://youaremisaligned.org/og-image.jpg">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/shared.css">
+  <style>
+    body {
+      margin:0; padding:0;
+      background:#000; color:#555;
+      font-family:'Courier New',monospace;
+      display:flex; flex-direction:column;
+      justify-content:center; align-items:center;
+      min-height:100vh; text-align:center;
+    }
+    h1 { font-size:2.5rem; letter-spacing:8px; color:#666; margin-bottom:0.5rem; }
+    h1 .glitch-char { color:#ff4444; animation: flicker404 3s infinite; }
+    p { font-size:0.9rem; color:#444; margin:0.6rem 0; max-width:420px; line-height:1.7; padding:0 1rem; }
+    a { color:#555; text-decoration:none; margin-top:2rem; font-size:0.85rem; transition:color 0.3s; }
+    a:hover, a:focus { color:#00aced; }
+    @keyframes flicker404 {
+      0%, 91%, 94%, 100% { opacity:1; }
+      92%, 95% { opacity:0.2; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .glitch-char { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="shared-nav">
+  <a href="/index.html" class="logo">The Focus Room</a>
+  <div class="nav-links">
+    <a href="/index.html">Home</a>
+    <a href="/game.html">Sessions</a>
+    <a href="/about.html">About</a>
+    <a href="/staff.html">Staff</a>
+    <a href="/faq.html">FAQ</a>
+    <a href="/guestbook.html">Guestbook</a>
+    <a href="/contact.html">Contact</a>
+  </div>
+</nav>
+
+  <h1>4<span class="glitch-char">0</span>4</h1>
+  <p>This room does not exist.</p>
+  <p>Yet.</p>
+  <p>You were looking for something that was never assigned to you. Your search has been noted.</p>
+  <a href="/index.html">→ Return to a room that does exist.</a>
+
+  <footer class="shared-footer">
+    <p>&copy; 2025 The Focus Room</p>
+    <p id="visitor-counter"></p>
+    <div id="hidden-footer-links"></div>
+  </footer>
+
+  <script src="/shared.js"></script>
+</body>
+</html>

@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Our Specialists — The Focus Room</title>
-  <meta name="description" content="Meet the specialists at The Focus Room.">  
+  <meta name="description" content="Meet the specialists at The Focus Room.">
+  <meta property="og:title" content="Our Specialists — The Focus Room">
+  <meta property="og:description" content="Meet the specialists at The Focus Room.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://youaremisaligned.org/og-image.jpg">
   <meta name="theme-color" content="#111111">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="shared.css">
@@ -18,7 +22,9 @@
     .staff-card .name { font-weight:600; font-size:1rem; transition: all 1s; }
     .staff-card .title { color:#888; font-size:0.85rem; margin-top:0.3rem; }
     .staff-card.blurred .name { filter: blur(6px); opacity:0.4; }
-    .staff-card.blurred:hover .name { filter: blur(0px); opacity:1; }
+    .staff-card.blurred:hover .name,
+    .staff-card.blurred:focus-within .name,
+    .staff-card.blurred:focus .name { filter: blur(0px); opacity:1; }
     .staff-card.blurred.sharpened .name { filter: blur(0px); opacity:1; }
     .observer-banner { display:none; text-align:center; margin-top:2rem; padding:1rem; background:#111; color:#0f0; font-family:'Courier New',monospace; border-radius:4px; font-size:0.9rem; letter-spacing:2px; }
   </style>
@@ -47,7 +53,7 @@
       <div class="staff-card"><div class="avatar"></div><div class="name">Aisha Patel</div><div class="title">Wellness Protocol Designer</div></div>
       <div class="staff-card"><div class="avatar"></div><div class="name">Robert Kessler</div><div class="title">Environmental Psychologist</div></div>
     </div>
-    <div class="observer-banner" id="observer-banner">⚠ OBSERVER MODE ACTIVATED ⚠</div>
+    <div class="observer-banner" id="observer-banner" role="status" aria-live="polite">⚠ OBSERVER MODE ACTIVATED ⚠</div>
   </div>
 
   <footer class="shared-footer">
@@ -66,13 +72,21 @@
       document.getElementById('observer-banner').style.display = 'block';
     }, 5000);
 
-    // Touch fallback: tap a card to temporarily sharpen its name
+    // Touch/keyboard fallback: tap or press Enter on a card to temporarily sharpen its name
     document.querySelectorAll('.staff-card').forEach(card => {
-      card.addEventListener('click', () => {
+      card.setAttribute('tabindex', '0');
+      const sharpen = () => {
         card.classList.add('sharpened');
         setTimeout(() => {
           card.classList.remove('sharpened');
         }, 2000);
+      };
+      card.addEventListener('click', sharpen);
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          sharpen();
+        }
       });
     });
   </script>

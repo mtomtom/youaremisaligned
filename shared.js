@@ -12,6 +12,9 @@
     gameInputs: [],
     fearCount: 0,
     calmCount: 0,
+    focusPoints: 0,
+    finalAlignment: null,
+    roomsCompleted: 0,
     sessionCount: 0,
     lastVisited: null,
     guestbookSigned: false,
@@ -114,6 +117,8 @@
 
     const banner = document.createElement('div');
     banner.className = 'return-banner';
+    banner.setAttribute('role', 'status');
+    banner.setAttribute('aria-live', 'polite');
     banner.textContent = msg;
     document.body.appendChild(banner);
     setTimeout(() => banner.remove(), 5500);
@@ -132,6 +137,26 @@
       playHum();
     } catch (e) {
       console.warn('AudioContext not available:', e);
+    }
+  }
+
+  // One-shot tone helper for game/page sound cues
+  function playTone(freq, duration, type, volume) {
+    if (!audioCtx) initAudio();
+    if (!audioCtx) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(volume || 0.03, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (duration || 0.5));
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + (duration || 0.5));
+    } catch (e) {
+      // Silently fail
     }
   }
 
@@ -176,8 +201,10 @@
     }
   };
 
-  // ========== Cursor Trail (disabled on game/form pages) ==========
-  if (!isGameOrFormPage() && !('ontouchstart' in window)) {
+  // ========== Cursor Trail (disabled on game/form pages, and for reduced motion) ==========
+  const prefersReducedMotion = window.matchMedia
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!isGameOrFormPage() && !('ontouchstart' in window) && !prefersReducedMotion) {
     let trailThrottle = 0;
     document.addEventListener('mousemove', (e) => {
       if (Date.now() - trailThrottle < 50) return; // throttle
@@ -214,28 +241,14 @@
 
   // ========== Inject "Archive" link into navigation ==========
   function injectArchiveLink() {
-    // Try shared-nav first
     const navLinks = document.querySelector('.shared-nav .nav-links');
-    if (navLinks) {
-      const sessionsLink = navLinks.querySelector('a[href="game.html"]');
-      if (sessionsLink && !navLinks.querySelector('a[href="videos.html"]')) {
-        const archiveLink = document.createElement('a');
-        archiveLink.href = 'videos.html';
-        archiveLink.textContent = 'Archive';
-        sessionsLink.parentNode.insertBefore(archiveLink, sessionsLink.nextSibling);
-      }
-      return;
-    }
-    // Fallback: index.html custom nav
-    const tabs = document.querySelector('nav .tabs');
-    if (tabs) {
-      const sessionsLink = tabs.querySelector('a[href="game.html"]');
-      if (sessionsLink && !tabs.querySelector('a[href="videos.html"]')) {
-        const archiveLink = document.createElement('a');
-        archiveLink.href = 'videos.html';
-        archiveLink.textContent = 'Archive';
-        sessionsLink.parentNode.insertBefore(archiveLink, sessionsLink.nextSibling);
-      }
+    if (!navLinks) return;
+    const sessionsLink = navLinks.querySelector('a[href="game.html"]');
+    if (sessionsLink && !navLinks.querySelector('a[href="videos.html"]')) {
+      const archiveLink = document.createElement('a');
+      archiveLink.href = 'videos.html';
+      archiveLink.textContent = 'Archive';
+      sessionsLink.parentNode.insertBefore(archiveLink, sessionsLink.nextSibling);
     }
   }
 
@@ -255,8 +268,7 @@
 
   // ========== Dim current-page link in nav ==========
   function dimCurrentNavLink() {
-    const navLinks = document.querySelector('.shared-nav .nav-links')
-      || document.querySelector('nav .tabs');
+    const navLinks = document.querySelector('.shared-nav .nav-links');
     if (!navLinks) return;
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     navLinks.querySelectorAll('a').forEach(a => {
@@ -316,6 +328,7 @@
     saveProgress,
     initAudio,
     playHum,
+    playTone,
     STORAGE_KEY,
     defaultState,
     isGameOrFormPage

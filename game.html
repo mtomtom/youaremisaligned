@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Room — The Focus Room</title>
   <meta name="description" content="Your focus alignment session begins.">
+  <meta property="og:title" content="The Room — The Focus Room">
+  <meta property="og:description" content="Your focus alignment session begins.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://youaremisaligned.org/og-image.jpg">
   <meta name="theme-color" content="#111111">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="shared.css">
@@ -26,15 +30,15 @@
   </nav>
 
   <div id="container">
-    <!-- HUD: Room counter, phase dots, input count -->
+    <!-- HUD: Step counter, phase dots, FP, alignment -->
     <div class="game-hud">
       <div class="hud-item">
-        <span class="hud-label">Room</span>
+        <span class="hud-label">Step</span>
         <span class="hud-value" id="room-counter">1</span>
         <span class="hud-label">/ 10</span>
       </div>
       <div class="hud-item">
-        <div class="phase-dots">
+        <div class="phase-dots" title="Session phase">
           <span class="phase-dot active" id="phase-dot-1"></span>
           <span class="phase-dot" id="phase-dot-2"></span>
           <span class="phase-dot" id="phase-dot-3"></span>
@@ -42,31 +46,58 @@
       </div>
       <div class="hud-item">
         <span class="hud-label">FP</span>
-        <span class="hud-value" id="fp-counter">0</span>
+        <span class="hud-value" id="fp-counter" title="Focus Points">0</span>
       </div>
       <div class="hud-item">
         <span class="hud-label">Align</span>
-        <span class="hud-value" id="align-counter">--</span>
+        <span class="hud-value" id="align-counter" title="Target: 70%">--</span>
       </div>
     </div>
 
-    <canvas id="roomCanvas" width="800" height="600"></canvas>
+    <canvas id="roomCanvas" width="800" height="600">
+      An interactive assessment room. The room's questions are announced below as text.
+    </canvas>
+    <!-- Canvas text mirrored here for screen readers (main.js) -->
+    <p id="sr-canvas-text" class="visually-hidden" aria-live="polite" role="status"></p>
 
     <input
       id="inputBox"
       type="text"
       placeholder="type something"
       autocomplete="off"
+      aria-label="Your answer to the room"
     />
-    <p class="exit-hint" id="exit-hint">type "exit" to leave the room</p>
+    <p class="exit-hint" id="exit-hint">the room will release you when it's done</p>
 
     <a href="results.html" class="leave-room-btn" id="leave-room-btn">Leave Room</a>
   </div>
 
+  <!-- Onboarding overlay -->
+  <div id="onboarding-overlay" class="game-overlay" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+    <div class="overlay-content onboarding-content">
+      <h2 id="onboarding-title">WELCOME TO THE ROOM</h2>
+      <div id="onboarding-text">
+        <p>This is an interactive alignment assessment.</p>
+        <ul class="onboarding-list">
+          <li>Type your answers to the questions that appear.</li>
+          <li>Stay calm — fear responses affect your alignment score.</li>
+          <li>Answer 10 questions to complete your session.</li>
+          <li>Maintain <strong>70% alignment</strong> to escape.</li>
+        </ul>
+        <div class="hud-legend">
+          <span>Step = progress &nbsp;|&nbsp; FP = focus points &nbsp;|&nbsp; Align = your score</span>
+        </div>
+      </div>
+      <div class="overlay-buttons">
+        <button class="overlay-btn" id="begin-btn">Begin Session</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Win overlay -->
-  <div id="win-overlay" class="game-overlay hidden">
+  <div id="win-overlay" class="game-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="win-title">
     <div class="overlay-content">
-      <h2>YOU ESCAPED THE ROOM.</h2>
+      <h2 id="win-title">YOU ESCAPED THE ROOM.</h2>
       <p>Final Alignment: <span id="win-alignment">--</span>%</p>
       <p>Focus Points: <span id="win-fp">--</span></p>
       <p class="win-message">The room releases you. For now.</p>
@@ -78,16 +109,17 @@
   </div>
 
   <!-- Lose overlay -->
-  <div id="lose-overlay" class="game-overlay hidden">
+  <div id="lose-overlay" class="game-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="lose-title">
     <div class="overlay-content">
-      <h2>THE ROOM KEEPS YOU.</h2>
+      <h2 id="lose-title">THE ROOM KEEPS YOU.</h2>
       <p>Alignment insufficient: <span id="lose-alignment">--</span>%</p>
       <p>Phase 3 is permanent.</p>
       <p class="lose-message">There is no exit.<br>There was never an exit.</p>
       <div class="overlay-buttons">
-        <button class="overlay-btn" id="stay-btn">Stay Forever</button>
+        <button class="overlay-btn" id="stay-btn">Continue in the Room</button>
         <button class="overlay-btn" id="lose-retry-btn">Try Again</button>
       </div>
+      <p style="font-size: 0.7rem; color: #444; margin-top: 0.5rem;">The nightmare continues. There is no undo.</p>
     </div>
   </div>
 

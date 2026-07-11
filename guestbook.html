@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Visitor Log — The Focus Room</title>
-  <meta name="description" content="Sign the visitor log at The Focus Room.">  
+  <meta name="description" content="Sign the visitor log at The Focus Room.">
+  <meta property="og:title" content="Visitor Log — The Focus Room">
+  <meta property="og:description" content="Sign the visitor log at The Focus Room.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://youaremisaligned.org/og-image.jpg">
   <meta name="theme-color" content="#111111">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="shared.css">
@@ -41,6 +45,7 @@
     <div id="entries"></div>
     <div id="sign-form">
       <h3>Sign the guestbook</h3>
+      <label for="sign-name" class="visually-hidden">Your name</label>
       <input type="text" id="sign-name" placeholder="Your name...">
       <button id="sign-btn">Sign</button>
     </div>

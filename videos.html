@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Archive: Sensory Recalibration</title>
+    <meta name="description" content="Archived sensory recalibration logs. Unauthorized viewing is a violation of Wellness Protocol 09.">
+    <meta property="og:title" content="Archive: Sensory Recalibration">
+    <meta property="og:description" content="Archived sensory recalibration logs.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://youaremisaligned.org/og-image.jpg">
+    <meta name="theme-color" content="#0a0a0a">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="shared.css">
     <style>
@@ -140,7 +146,8 @@
     z-index: 1;
     pointer-events: none; /* Allows you to click 'through' the fuzz */
     opacity: 0.15;
-    background-image: url('https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Resolution_White_Noise.png');
+    /* Self-hosted static: SVG turbulence noise (no external request) */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     animation: noise 0.2s infinite;
 }
 
@@ -201,13 +208,13 @@
     <div class="feed image-feed">
         <div class="rec-dot"></div>
         <div class="fuzzy-overlay"></div>
-        <img src="images/room1.png" class="surveillance-img">
+        <img src="images/room1.webp" class="surveillance-img" alt="Surveillance feed: an empty consultation room" loading="lazy">
     </div>
 
     <div class="feed image-feed">
         <div class="rec-dot"></div>
         <div class="fuzzy-overlay"></div>
-        <img src="images/room2.png" class="surveillance-img">
+        <img src="images/room2.webp" class="surveillance-img" alt="Surveillance feed: an empty office lounge" loading="lazy">
     </div>
 </div>
     
@@ -217,86 +224,7 @@
     <div><span class="cursor"></span></div>
 </div>
 
-<script>
-    const chatLog = document.getElementById('chat-log');
-    
-    const messages = [
-        "Connection secure.",
-        "Subject identified. Pulse: Accelerated.",
-        "You're watching the eye, aren't you?",
-        "Don't worry. It's watching you back.",
-        "The calibration is 42% complete.",
-        "Your reflection is looking tired.",
-        "Would you like to see what's behind the mirror?",
-        "Do not close this window. We are almost finished."
-    ];
-
-    let messageIndex = 0;
-
-    function addMessage() {
-        if (messageIndex < messages.length) {
-            const entry = document.createElement('div');
-            entry.style.marginBottom = "10px";
-            entry.innerHTML = `<span style="opacity:0.5;">[${new Date().toLocaleTimeString()}]</span> > ${messages[messageIndex]}`;
-            chatLog.appendChild(entry);
-            
-            // Auto-scroll chat
-            chatLog.scrollTop = chatLog.scrollHeight;
-            
-            messageIndex++;
-            // New message every 6 to 12 seconds
-            setTimeout(addMessage, Math.random() * 6000 + 6000);
-        }
-    }
-
-    // Start the agent messages after 4 seconds
-    setTimeout(addMessage, 4000);
-
-    // List all your filenames here
-const imagePool = [
-    'images/room1.png',
-    'images/room2.png',
-    'images/room3.png',
-    'images/room4.png',
-    'images/room5.png',
-    'images/room6.png',
-    'images/room7.png',
-    'images/room8.png',
-    'images/room9.png',
-    'images/room10.png'
-];
-
-// This selects ALL feeds with the class "image-feed"
-const allImageFeeds = document.querySelectorAll('.image-feed');
-
-allImageFeeds.forEach(feed => {
-    feed.addEventListener('click', () => {
-        const img = feed.querySelector('.surveillance-img');
-        
-        // 1. Glitch Effect
-        img.style.filter = "invert(100%) contrast(500%) blur(20px)";
-        feed.style.backgroundColor = "#fff";
-
-        // 2. Random Swap
-        let newIndex = Math.floor(Math.random() * imagePool.length);
-        
-        setTimeout(() => {
-            img.src = imagePool[newIndex];
-            
-            // 3. Reset Styles
-            img.style.filter = "grayscale(100%) contrast(150%) brightness(0.7) blur(0.5px)";
-            feed.style.backgroundColor = "#000";
-            
-            // 4. Update the Agent Chat
-            const log = document.getElementById('chat-log');
-            const entry = document.createElement('div');
-            entry.innerHTML = `> <span style="color:red;">INTERCEPT:</span> Switching feed to ${imagePool[newIndex]}`;
-            log.appendChild(entry);
-            log.scrollTop = log.scrollHeight;
-        }, 150);
-    });
-});
-</script>
+<script src="videos.js"></script>
 
 <footer class="shared-footer">
     <p>&copy; 2025 The Focus Room</p>

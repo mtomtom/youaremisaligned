@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Focus Room - Next Page</title>
 <meta name="description" content="Are you ready for assessment?">
+<meta property="og:title" content="The Focus Room — Next Page">
+<meta property="og:description" content="Are you ready for assessment?">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://youaremisaligned.org/og-image.jpg">
 <meta name="theme-color" content="#111111">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="shared.css">
@@ -148,12 +152,21 @@ btn.addEventListener('click', () => {
 // Mobile: button becomes clickable after 3 seconds
 if ('ontouchstart' in window) {
   setTimeout(() => {
-    document.removeEventListener('mousemove', dodgeHandler);
+    if (dodgeHandler) document.removeEventListener('mousemove', dodgeHandler);
     dodgeHandler = null;
     btn.style.position = 'static';
     btn.textContent = 'Continue';
   }, 3000);
 }
+
+// Keyboard: tabbing to the button makes it give up (it can't dodge focus)
+btn.addEventListener('focus', () => {
+  if (resigned) return;
+  resigned = true;
+  btn.classList.add('resigned');
+  btn.textContent = '...fine. Go ahead.';
+  if (dodgeHandler) document.removeEventListener('mousemove', dodgeHandler);
+});
 </script>
 
 </body>

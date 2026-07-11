@@ -1,0 +1,10 @@
+.DS_Store
+
+# Design/dev docs — spoilers, never publish
+PLAN.md
+CHANGES.md
+IMPLEMENTATION_SUMMARY.md
+SITE_REVIEW.md
+
+# graphify output
+graphify-out/
