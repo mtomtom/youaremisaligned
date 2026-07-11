@@ -703,11 +703,13 @@ logo.addEventListener('click', (e) => {
   }
 });
 
-// Background changes based on session count
+// Background changes based on session count — darken only the street outside,
+// never the overlay card and its photo (a filter on the hero dims everything in it)
 const idxProgress = FocusRoom.getProgress();
 if (idxProgress.totalVisits > 3) {
-  // Subtle shift: darker background on return visits
-  document.getElementById('hero').style.filter = `brightness(${Math.max(0.6, 1 - (idxProgress.totalVisits * 0.03))})`;
+  const shade = Math.min(0.35, (idxProgress.totalVisits - 3) * 0.04);
+  heroSection.style.backgroundImage =
+    `linear-gradient(rgba(0,0,0,${shade}), rgba(0,0,0,${shade})), url('clinic_outside.webp')`;
 }
 // Void visitor: the room remembers
 if (idxProgress.voidVisited) {

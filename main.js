@@ -101,6 +101,11 @@ let scaryCooldown = 0;
 let exitHintShown = false;
 let onboardingDismissed = false;
 
+// Scoring state (totalRooms must be initialized before the questionCount cap below)
+let focusPoints = progress.focusPoints || 0;
+const totalRooms = 10;
+const WIN_ALIGNMENT = 70;
+
 // questionCount tracks actual questions answered (not raw inputs)
 let questionCount = progress.roomsCompleted || 0;
 // Cap at 0 if previously completed or exited — prevents instant win/lose dump on return
@@ -109,11 +114,6 @@ if (questionCount >= totalRooms) questionCount = 0;
 // Session-local scoring (reset each game session)
 let sessionCalmCount = 0;
 let sessionFearCount = 0;
-
-// Scoring state
-let focusPoints = progress.focusPoints || 0;
-const totalRooms = 10;
-const WIN_ALIGNMENT = 70;
 let gameEnded = false;
 let gameWon = false;
 
