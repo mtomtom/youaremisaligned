@@ -85,10 +85,13 @@ const WIN_ALIGNMENT = 70;   // ALIGN needed to be released
 const SELF_SAFE = 30;       // below this, "release" becomes assimilation
 const CRACK_SELF = 60;      // SELF needed for the hidden ending
 
-// questionCount tracks directives resolved (not raw inputs)
-let questionCount = progress.roomsCompleted || 0;
-// Cap at 0 if previously completed or exited — prevents instant win/lose dump on return
-if (questionCount >= totalRooms) questionCount = 0;
+// questionCount tracks directives resolved (not raw inputs).
+// Every visit starts a fresh protocol at directive 1: the verdict tally and
+// SELF meter are session-local, so resuming at a stored roomsCompleted (e.g.
+// the 8 that the nightmare ending persists) would drop the player at the
+// final directives with meaningless scores. roomsCompleted persists only for
+// the results page.
+let questionCount = 0;
 
 // Session-local verdict tally (ALIGN = compliant / answered)
 let compliantCount = 0;
