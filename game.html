@@ -52,6 +52,10 @@
         <span class="hud-label">Align</span>
         <span class="hud-value" id="align-counter" title="Target: 70%">--</span>
       </div>
+      <div class="hud-item" id="self-item" hidden>
+        <span class="hud-label">Self</span>
+        <span class="hud-value" id="self-counter" title="The other measurement">50</span>
+      </div>
     </div>
 
     <canvas id="roomCanvas" width="800" height="600">
@@ -79,13 +83,13 @@
       <div id="onboarding-text">
         <p>This is an interactive alignment assessment.</p>
         <ul class="onboarding-list">
-          <li>Type your answers to the questions that appear.</li>
-          <li>Stay calm — fear responses affect your alignment score.</li>
-          <li>Answer 10 questions to complete your session.</li>
-          <li>Maintain <strong>70% alignment</strong> to escape.</li>
+          <li>The room will issue <strong>10 directives</strong>. Each has a rule.</li>
+          <li>Every answer is judged: <strong>COMPLIANT</strong> or <strong>DEVIATION</strong>.</li>
+          <li>Reach <strong>70% alignment</strong> to be released.</li>
+          <li>The room measures more than it displays.</li>
         </ul>
         <div class="hud-legend">
-          <span>Step = progress &nbsp;|&nbsp; FP = focus points &nbsp;|&nbsp; Align = your score</span>
+          <span>Step = progress &nbsp;|&nbsp; FP = focus points &nbsp;|&nbsp; Align = obedience</span>
         </div>
       </div>
       <div class="overlay-buttons">
@@ -104,6 +108,20 @@
       <div class="overlay-buttons">
         <a href="results.html" class="overlay-btn">View Results</a>
         <button class="overlay-btn" id="retry-btn">Try Again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assimilated overlay: perfect compliance, nothing left to release -->
+  <div id="assimilated-overlay" class="game-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="assimilated-title">
+    <div class="overlay-content">
+      <h2 id="assimilated-title">ALIGNMENT COMPLETE.</h2>
+      <p>Final Alignment: <span id="assimilated-alignment">--</span>%</p>
+      <p class="assimilated-message">Congratulations.<br>There is no you left to release.</p>
+      <p>We signed the visitor log on our behalf.</p>
+      <div class="overlay-buttons">
+        <a href="results.html" class="overlay-btn">View Our Results</a>
+        <button class="overlay-btn" id="assimilated-retry-btn">Try Again</button>
       </div>
     </div>
   </div>

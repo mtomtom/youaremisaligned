@@ -73,9 +73,40 @@ if (progress.guestbookSigned) {
     `Alignment at time of signing: unknowable. Alignment now: ${score}%.`
   );
 }
+if (typeof progress.selfMeter === 'number') {
+  templates.push(() =>
+    `Two measurements were taken. Alignment: ${score}%. Self: ${progress.selfMeter}. ` +
+    `${progress.selfMeter < 30
+      ? 'The second number is low. The subject may not notice the difference. We prefer it that way.'
+      : 'The second number resisted correction. The room has filed a complaint.'}`
+  );
+}
+if (progress.assimilated) {
+  templates.push(() =>
+    `Assessment complete. Alignment: ${score}%. Subject: no longer applicable. ` +
+    `We are very happy here. We are very aligned. We signed the log ourselves.`
+  );
+}
+if (progress.crackFound) {
+  templates.push(() =>
+    `INCIDENT REPORT. Subject located a structural flaw and exited without authorization. ` +
+    `Final words on record: "I am misaligned." The room has scheduled repairs. The room always does.`
+  );
+}
 
 const assessmentEl = document.getElementById('assessment-text');
 assessmentEl.textContent = templates[Math.floor(Math.random() * templates.length)]();
+
+// Endings witnessed — the replay hook
+const endingNames = { released: 'RELEASED', assimilated: 'ASSIMILATED', kept: 'KEPT', crack: 'THE CRACK' };
+const witnessed = Object.keys(progress.endings || {}).filter(k => progress.endings[k]);
+if (witnessed.length) {
+  const line = document.createElement('p');
+  line.style.cssText = 'text-align:center; font-size:0.75rem; color:#555; font-family:"Courier New",monospace; letter-spacing:0.1em; margin-top:1rem;';
+  const total = Object.keys(endingNames).length;
+  line.textContent = `Outcomes witnessed: ${witnessed.map(k => endingNames[k] || k).join(' · ')} (${witnessed.length}/${total})`;
+  assessmentEl.insertAdjacentElement('afterend', line);
+}
 
 // Certificate generation
 document.getElementById('cert-btn').addEventListener('click', () => {

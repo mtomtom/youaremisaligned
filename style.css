@@ -91,6 +91,34 @@ body {
   margin-left: 2px;
 }
 
+/* SELF — the other measurement, revealed in phase 2 */
+.hud-value[id="self-counter"] {
+  color: #b08fd8;
+}
+
+.hud-value[id="self-counter"].self-low {
+  color: #ff4444;
+  animation: selfFlicker 1.6s ease-in-out infinite;
+}
+
+#self-item.self-reveal {
+  animation: selfReveal 2s ease;
+}
+
+@keyframes selfReveal {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  45% { opacity: 0.2; }
+  60% { opacity: 1; }
+  75% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+@keyframes selfFlicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
 /* Phase indicator dots */
 .phase-dots {
   display: flex;
@@ -324,6 +352,47 @@ body {
   color: #44cc44;
   font-style: italic;
   margin-top: 1rem;
+}
+
+/* Assimilated overlay styling — serene on purpose; the calm is the horror */
+#assimilated-overlay {
+  background: rgba(8, 20, 28, 0.97);
+}
+
+#assimilated-overlay .overlay-content h2 {
+  color: #7fd4ff;
+  text-shadow: 0 0 24px rgba(127, 212, 255, 0.45);
+  letter-spacing: 5px;
+}
+
+#assimilated-overlay .overlay-content p {
+  color: #9fb8c4;
+  font-size: 0.95rem;
+}
+
+#assimilated-overlay .assimilated-message {
+  color: #d8eef8;
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+/* Canvas tear during the crack ending */
+#roomCanvas.cracking {
+  animation: crackShake 0.25s linear infinite;
+}
+
+@keyframes crackShake {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-3px, 2px); }
+  50% { transform: translate(3px, -2px); }
+  75% { transform: translate(-2px, -2px); }
+  100% { transform: translate(0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #roomCanvas.cracking { animation: none; }
+  #self-item.self-reveal { animation: none; }
+  .hud-value[id="self-counter"].self-low { animation: none; }
 }
 
 /* Lose overlay styling */

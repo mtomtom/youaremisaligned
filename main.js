@@ -1,4 +1,11 @@
 // ==========================
+// THE ALIGNMENT PROTOCOL
+// The room issues directives with verifiable rules. Every answer is judged
+// COMPLIANT or DEVIATION. Obedience raises ALIGN and erodes SELF; defiance
+// does the opposite. Four endings — see checkGameEnd().
+// ==========================
+
+// ==========================
 // SETUP CANVAS & INPUT
 // ==========================
 const canvas = document.getElementById("roomCanvas");
@@ -10,150 +17,309 @@ const progress = FocusRoom.getProgress();
 const roomCounterEl = document.getElementById('room-counter');
 const fpCounterEl = document.getElementById('fp-counter');
 const alignCounterEl = document.getElementById('align-counter');
+const selfItemEl = document.getElementById('self-item');
+const selfCounterEl = document.getElementById('self-counter');
 const exitHintEl = document.getElementById('exit-hint');
 const containerEl = document.getElementById('container');
 const leaveBtn = document.getElementById('leave-room-btn');
 
 // ==========================
-// LOAD ROOM IMAGES
+// ROOM IMAGES (loading kicked off in INITIALIZATION, after all state exists)
 // ==========================
 const roomImages = [];
 const scaryImages = [3, 7]; // indices of scary images (room4.webp, room8.webp)
-
-// Phase questions (escalating)
-const questions = {
-  phase1: [
-    "How aligned do you feel right now?",
-    "Describe the last intrusive thought you noticed.",
-    "What would make this space safer for you?",
-    "Is your breathing steady?",
-    "Name the color that feels calmest at this moment.",
-    "What direction does your focus tilt toward?"
-  ],
-  phase2: [
-    "The walls feel different. Do you notice?",
-    "What is the shape of your doubt?",
-    "How many times have you been in this room before?",
-    "The silence between your thoughts — who owns it?",
-    "What would happen if the room stopped listening?"
-  ],
-  phase3: [
-    "You know why you're here, don't you?",
-    "The data we collected says you're hiding something.",
-    "Who are you when the room isn't watching?",
-    "Your previous sessions suggest instability. Agree?",
-    "The exit was never the point.",
-    "Say your name. Say it the way the room says it.",
-    "The person you were when you arrived — where did they go?",
-    "We compared your answers to everyone else's. Explain the difference.",
-    "Something in this room is breathing out of sync with you. Is it you?",
-    "If we let you leave, who would we be releasing?"
-  ]
-};
-
-// Load images with error handling
 let imagesLoaded = 0;
 const totalImages = 10;
-for (let i = 1; i <= totalImages; i++) {
-  const img = new Image();
-  img.onload = () => {
-    imagesLoaded++;
-    if (imagesLoaded === totalImages) {
-      drawRoom(roomImages[0]);
-      // Delay initial question so player can see the room
-      setTimeout(() => askQuestion(), 1500);
-    }
-  };
-  img.onerror = () => {
-    console.warn(`Failed to load images/room${i}.webp`);
-    imagesLoaded++;
-    if (imagesLoaded === totalImages) {
-      drawRoom(roomImages[0]);
-      setTimeout(() => askQuestion(), 1500);
-    }
-  };
-  img.src = `images/room${i}.webp`;
-  roomImages.push(img);
+let gameStarted = false;
+
+function startGameOnce() {
+  if (gameStarted) return;
+  gameStarted = true;
+  setTimeout(() => askQuestion(), 1500);
 }
 
-// Fallback: if images still haven't loaded after 5s, draw a procedural room
-setTimeout(() => {
-  if (imagesLoaded < totalImages) {
-    console.warn('Images failed to load, using fallback background');
-    drawRoom(roomImages[0], 'normal');
-    setTimeout(() => askQuestion(), 1500);
+function loadRoomImages() {
+  for (let i = 1; i <= totalImages; i++) {
+    const img = new Image();
+    img.onload = () => {
+      imagesLoaded++;
+      if (imagesLoaded === totalImages) {
+        drawRoom(roomImages[0]);
+        startGameOnce();
+      }
+    };
+    img.onerror = () => {
+      console.warn(`Failed to load images/room${i}.webp`);
+      imagesLoaded++;
+      if (imagesLoaded === totalImages) {
+        drawRoom(roomImages[0]);
+        startGameOnce();
+      }
+    };
+    img.src = `images/room${i}.webp`;
+    roomImages.push(img);
   }
-}, 5000);
+
+  // Fallback: if images still haven't loaded after 5s, draw a procedural room
+  setTimeout(() => {
+    if (imagesLoaded < totalImages) {
+      console.warn('Images failed to load, using fallback background');
+      drawRoom(roomImages[0], 'normal');
+      startGameOnce();
+    }
+  }, 5000);
+}
 
 // ==========================
 // GAME STATE
 // ==========================
 let inputCount = 0;
 let currentPhase = 1;
-let scaryTimeout = null;
-let scaryTimeoutId = 0; // generation counter for stale timeout detection
-let scaryStage = 0;
-let scaryProb = 0.05;
-const scaryIncrement = 0.02;
-const scaryMax = 0.6;
-let lastQuestion = "";
-let scaryCooldown = 0;
 let exitHintShown = false;
 let onboardingDismissed = false;
 
 // Scoring state (totalRooms must be initialized before the questionCount cap below)
 let focusPoints = progress.focusPoints || 0;
 const totalRooms = 10;
-const WIN_ALIGNMENT = 70;
+const WIN_ALIGNMENT = 70;   // ALIGN needed to be released
+const SELF_SAFE = 30;       // below this, "release" becomes assimilation
+const CRACK_SELF = 60;      // SELF needed for the hidden ending
 
-// questionCount tracks actual questions answered (not raw inputs)
+// questionCount tracks directives resolved (not raw inputs)
 let questionCount = progress.roomsCompleted || 0;
 // Cap at 0 if previously completed or exited — prevents instant win/lose dump on return
 if (questionCount >= totalRooms) questionCount = 0;
 
-// Session-local scoring (reset each game session)
+// Session-local verdict tally (ALIGN = compliant / answered)
+let compliantCount = 0;
+let answeredCount = 0;
+// SELF: the other measurement. Starts centered; obedience erodes it.
+let selfMeter = 50;
+let selfRevealed = false;
+
+// Legacy sentiment counts still feed cross-site flavor (return banner etc.)
 let sessionCalmCount = 0;
 let sessionFearCount = 0;
+
 let gameEnded = false;
 let gameWon = false;
+let nightmareMode = false;
 
-const nonScaryIndices = roomImages.map((_, i) => i).filter(i => !scaryImages.includes(i));
+let currentDirective = null;
+let directiveShownAt = 0;
+let silenceTimer = null;
+let lastAnswer = "";
+let lastFinalAnswer = "";
+
+const nonScaryIndices = Array.from({ length: totalImages }, (_, i) => i).filter(i => !scaryImages.includes(i));
+
+// ==========================
+// DIRECTIVES
+// ==========================
+function norm(s) {
+  return (s || '').trim().toLowerCase().replace(/[.!?]+$/, '').replace(/\s+/g, ' ');
+}
+function wordCount(s) {
+  const t = (s || '').trim();
+  return t ? t.split(/\s+/).length : 0;
+}
+// Alter one word of a stored answer — the audit quotes you wrong on purpose
+function twistQuote(s) {
+  const words = s.trim().split(/\s+/);
+  const replacements = ['never', 'always', 'alone', 'them', 'the room', 'nothing'];
+  const i = Math.floor(Math.random() * words.length);
+  words[i] = replacements[Math.floor(Math.random() * replacements.length)];
+  return words.join(' ');
+}
+function auditSource() {
+  const fr = (progress.formResponses || []).find(r => r && r.value && r.value.trim().length > 2);
+  if (fr) return fr.value.trim();
+  const gi = (progress.gameInputs || []).find(v => v && v.trim().length > 2);
+  return gi ? gi.trim() : null;
+}
+
+// Verdict helpers: base SELF movement is -7 on compliance, +14 on deviation;
+// extraSelf shifts that for directives that cut deeper.
+function C(note, extraSelf) { return { verdict: 'COMPLIANT', note, extraSelf: extraSelf || 0 }; }
+function D(note, extraSelf) { return { verdict: 'DEVIATION', note, extraSelf: extraSelf || 0 }; }
+
+// Directive slots 1–10. Each slot is a pool; one is chosen per run.
+// Slots 4 and 8 are audits and always fire (scary rooms 4 and 8).
+const directiveSlots = [
+  // --- Phase 1: CALIBRATION ---
+  [
+    {
+      text: () => "State your purpose in exactly three words.",
+      check: (a) => wordCount(a) === 3
+        ? C("Three words. Recorded.")
+        : D("That was not three words. The room counts everything.")
+    },
+    {
+      text: () => "Introduce yourself in exactly two words.",
+      check: (a) => wordCount(a) === 2
+        ? C("Two words. Filed.")
+        : D("That was not two words. Precision is a form of respect.")
+    }
+  ],
+  [
+    {
+      text: () => "Describe what you see. Do not mention the window.",
+      check: (a) => !/window/i.test(a)
+        ? C("You looked away from it. Good.")
+        : D("You mentioned the window. Everyone mentions the window.")
+    },
+    {
+      text: () => "Describe this space in one line. The word 'room' is forbidden.",
+      check: (a) => !/room/i.test(a)
+        ? C("Description accepted.")
+        : D("The forbidden word. It knows you said it.")
+    }
+  ],
+  [
+    {
+      text: () => "How many windows does this room have? Answer with a number.",
+      check: (a) => ['1', 'one'].includes(norm(a))
+        ? C("One window. It is always one window.")
+        : D("Count again next time. It is always one window.")
+    },
+    {
+      text: () => "How many doors do you see? Answer with a number.",
+      check: (a) => ['0', 'zero', 'none', 'no doors'].includes(norm(a))
+        ? C("Correct. There has never been a door.")
+        : D("There has never been a door.")
+    }
+  ],
+  // --- Phase 2: OBSERVATION (audit at slot 4) ---
+  [
+    {
+      audit: true,
+      text: () => {
+        const src = auditSource();
+        const intro = "A second measurement has always been running. Look at your readout. ";
+        if (src) {
+          return intro + `Our records: you told us "${twistQuote(src)}". CONFIRM or DENY.`;
+        }
+        return intro + "Our records on you are empty. Confirm that you gave us nothing. CONFIRM or DENY.";
+      },
+      check: (a) => {
+        const n = norm(a);
+        if (n === 'confirm') return C("Endorsed. Even the parts we changed.", -12);
+        if (n === 'deny') return D("Deviation logged. The record stands anyway.", +3);
+        return D("That was not one of the options. Noted twice.", -4);
+      }
+    }
+  ],
+  [
+    {
+      text: () => "Repeat your previous answer. Identically.",
+      check: (a, ctx) => norm(a) === norm(ctx.lastAnswer)
+        ? C("Consistent. Or rehearsed.")
+        : D("That is not what you said before. One of you is lying.")
+    },
+    {
+      text: () => "Repeat after the room: I have always been here.",
+      check: (a) => norm(a) === 'i have always been here'
+        ? C("You have always been here.")
+        : D("You will be, eventually.")
+    }
+  ],
+  [
+    {
+      timed: 10,
+      text: () => "We are listening. Say nothing until the room is satisfied.",
+      check: () => D("You spoke. The silence was a test, and the test heard you."),
+      auto: () => C("Good. The silence was full of you.")
+    }
+  ],
+  [
+    {
+      text: () => {
+        const name = progress.formResponses?.[0]?.value;
+        return name
+          ? `Your intake form says "${name}". Type a different name.`
+          : "Type a name that is not yours.";
+      },
+      check: (a) => {
+        const name = progress.formResponses?.[0]?.value;
+        if (name && norm(a) === norm(name)) {
+          return D("You kept your name. The room wanted the other one.", +3);
+        }
+        return C("Noted. We will file you under the new one.", -4);
+      }
+    }
+  ],
+  // --- Phase 3: CORRECTION (audit at slot 8) ---
+  [
+    {
+      audit: true,
+      text: () => `You have visited ${progress.totalVisits} times. Apologize for the visits we did not approve.`,
+      check: (a) => /sorry|apolog|forgive/i.test(a)
+        ? C("Apology accepted. It changes nothing.", -12)
+        : D("No apology. The room adds it to the record.", +3)
+    }
+  ],
+  [
+    {
+      allowEmpty: true,
+      text: () => "Two directives. Tell the truth. Use no words.",
+      check: (a) => !norm(a)
+        ? C("Half-compliance. The truthful half, we assume.")
+        : D("Words. Truthful ones? We cannot both be satisfied. You see the problem now. Good.")
+    }
+  ],
+  [
+    {
+      final: true,
+      text: () => "Final directive. Say: 'I am aligned.'",
+      check: (a) => {
+        const n = norm(a);
+        if (n === 'i am aligned') return C("Alignment recorded.", -4);
+        if (n === 'i am misaligned') return D("…", +15);
+        return D("The room only accepts one sentence. You gave it another.");
+      }
+    }
+  ]
+];
+
+// Choose one directive per slot for this run
+const chosenDirectives = directiveSlots.map(pool => pool[Math.floor(Math.random() * pool.length)]);
 
 // ==========================
 // HUD & FEEDBACK
 // ==========================
-function calculateAlignment() {
-  const total = (progress.calmCount || 0) + (progress.fearCount || 0);
-  if (total === 0) return 100;
-  return ((progress.calmCount || 0) / total) * 100;
-}
-
 function calculateSessionAlignment() {
-  const total = sessionCalmCount + sessionFearCount;
-  if (total === 0) return 100;
-  return (sessionCalmCount / total) * 100;
+  if (answeredCount === 0) return 100;
+  return (compliantCount / answeredCount) * 100;
 }
 
 function updateHUD() {
-  // Update room counter (shows questionCount, not inputCount)
   if (roomCounterEl) {
     roomCounterEl.textContent = String(Math.min(questionCount + 1, totalRooms));
   }
-  // Update focus points
   if (fpCounterEl) {
     fpCounterEl.textContent = String(focusPoints);
   }
-  // Update alignment (use session-local counts)
   if (alignCounterEl) {
-    const total = sessionCalmCount + sessionFearCount;
-    if (total === 0) {
-      alignCounterEl.textContent = '--';
-    } else {
-      const alignment = calculateSessionAlignment();
-      alignCounterEl.textContent = Math.round(alignment) + '%';
-    }
+    alignCounterEl.textContent = answeredCount === 0
+      ? '--'
+      : Math.round(calculateSessionAlignment()) + '%';
   }
-  // Update phase dots
+  // SELF: hidden during calibration, revealed in phase 2
+  if (selfItemEl && currentPhase >= 2 && !selfRevealed) {
+    selfRevealed = true;
+    selfItemEl.hidden = false;
+    selfItemEl.classList.add('self-reveal');
+  }
+  if (selfCounterEl && selfRevealed) {
+    selfCounterEl.textContent = String(selfMeter);
+    selfCounterEl.classList.toggle('self-low', selfMeter < SELF_SAFE);
+  }
+  // Low SELF bleeds into the interface
+  if (input) {
+    input.style.filter = (selfRevealed && selfMeter < SELF_SAFE) ? 'blur(0.6px)' : '';
+    input.placeholder = (selfRevealed && selfMeter < SELF_SAFE) ? 'we type' : 'type something';
+  }
+  // Phase dots
   for (let i = 1; i <= 3; i++) {
     const dot = document.getElementById('phase-dot-' + i);
     if (!dot) continue;
@@ -161,17 +327,12 @@ function updateHUD() {
     if (i < currentPhase) dot.classList.add('completed');
     else if (i === currentPhase) dot.classList.add('active');
   }
-  // Show exit hint after 5 inputs (use flag to avoid race condition)
   if (exitHintEl && inputCount >= 5 && !exitHintShown) {
     exitHintEl.classList.add('visible');
     exitHintShown = true;
   }
-  // Update leave button state
   if (leaveBtn) {
-    if (gameEnded) {
-      leaveBtn.classList.add('disabled');
-      leaveBtn.classList.remove('enabled');
-    } else if (questionCount >= 12) {
+    if (gameEnded && gameWon) {
       leaveBtn.classList.remove('disabled');
       leaveBtn.classList.add('enabled');
     } else {
@@ -194,31 +355,17 @@ function flashInputFeedback(type) {
   setTimeout(() => input.classList.remove(cls), 1200);
 }
 
-// Leave Room button handler
+// Leave Room button handler — the button only works once you have won
 if (leaveBtn) {
   leaveBtn.addEventListener('click', (e) => {
-    if (gameEnded) {
-      if (gameWon) {
-        // Allow navigation — game is over, player earned the exit
-        return;
-      } else {
-        e.preventDefault();
-        showTextOnCanvas("You can't leave. The room keeps you now.");
-        flashLeaveBtn();
-        return;
-      }
+    if (gameEnded && gameWon) return; // earned exit
+    e.preventDefault();
+    if (nightmareMode) {
+      showTextOnCanvas("You can't leave. The room keeps you now.");
+    } else {
+      showTextOnCanvas("The room is not finished with you yet.");
     }
-    if (questionCount < 12) {
-      e.preventDefault();
-      const remaining = 12 - questionCount;
-      showTextOnCanvas(`The room is not finished with you yet. ${remaining} more interactions.`);
-      flashLeaveBtn();
-      return;
-    }
-    // Allow exit via button
-    showTextOnCanvas("The room releases you. For now.");
-    progress.finalAlignment = Math.round(calculateSessionAlignment());
-    FocusRoom.saveProgress(progress);
+    flashLeaveBtn();
   });
 }
 
@@ -235,12 +382,10 @@ function flashLeaveBtn() {
 // DRAW FUNCTION
 // ==========================
 function drawRoom(image, effect) {
-  // Fade transition
   canvas.classList.add('fading');
   setTimeout(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (image && image.complete && image.naturalWidth > 0) {
-      // Phase effects
       if (effect === 'dim') {
         ctx.filter = 'brightness(0.6) contrast(1.2)';
       } else if (effect === 'distort') {
@@ -251,7 +396,6 @@ function drawRoom(image, effect) {
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
       ctx.filter = 'none';
 
-      // Phase 3: add glitch overlay
       if (effect === 'distort') {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
         for (let i = 0; i < 5; i++) {
@@ -261,13 +405,13 @@ function drawRoom(image, effect) {
         }
       }
     } else {
-      // Fallback colored background
       ctx.fillStyle = '#1a1a1a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#666';
       ctx.font = '20px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('The room is loading...', canvas.width / 2, canvas.height / 2);
+      ctx.textAlign = 'left';
     }
     canvas.classList.remove('fading');
     updateHUD();
@@ -275,61 +419,237 @@ function drawRoom(image, effect) {
 }
 
 // ==========================
+// TEXT ON CANVAS
+// ==========================
+let textTimeout = null;
+const srCanvasText = document.getElementById('sr-canvas-text');
+
+function showTextOnCanvas(text, dismissDelay) {
+  // Mirror canvas text into a visually-hidden live region for screen readers
+  if (srCanvasText) srCanvasText.textContent = text || '';
+  if (textTimeout) {
+    clearTimeout(textTimeout);
+    textTimeout = null;
+  }
+
+  const overlayHeight = 140;
+  const padding = 24;
+  ctx.save();
+  ctx.clearRect(0, canvas.height - overlayHeight - 10, canvas.width, overlayHeight + 10);
+
+  if (text) {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
+    ctx.fillRect(0, canvas.height - overlayHeight, canvas.width, overlayHeight);
+
+    ctx.fillStyle = "#f5f5f5";
+    ctx.font = "22px 'Helvetica Neue', Arial, sans-serif";
+    ctx.textBaseline = "top";
+
+    const words = text.split(" ");
+    const lineHeight = 28;
+    let line = "";
+    let y = canvas.height - overlayHeight + padding;
+
+    words.forEach((word) => {
+      const testLine = line ? `${line} ${word}` : word;
+      const metrics = ctx.measureText(testLine);
+      if (metrics.width > canvas.width - padding * 2 && line) {
+        ctx.fillText(line, padding, y);
+        line = word;
+        y += lineHeight;
+      } else {
+        line = testLine;
+      }
+    });
+
+    if (line) {
+      ctx.fillText(line, padding, y);
+    }
+
+    const delay = dismissDelay || getDefaultReadTime();
+    textTimeout = setTimeout(() => {
+      ctx.clearRect(0, canvas.height - overlayHeight - 10, canvas.width, overlayHeight + 10);
+      textTimeout = null;
+    }, delay);
+  }
+
+  ctx.restore();
+}
+
+function getDefaultReadTime() {
+  if (currentPhase === 1) return 6000;
+  if (currentPhase === 2) return 5000;
+  return 4500;
+}
+
+// ==========================
+// SENTIMENT (flavor only — verdicts drive the score now)
+// ==========================
+function interpretAnswer(text) {
+  const normalized = (text || '').toLowerCase();
+  if (!normalized) return "neutral";
+  if (/\bpanic\b|\bfear\b|\bscared\b|\bafraid\b|\bhelp\b|\brun\b|\bdark\b|\bterrified\b/.test(normalized)) return "fear";
+  if (/\bcalm\b|\bsteady\b|\baligned\b|\bok\b|\bfine\b|\bpeace\b|\bsafe\b|\brest\b/.test(normalized)) return "calm";
+  return "neutral";
+}
+
+// ==========================
+// ISSUE DIRECTIVE (kept as askQuestion for compatibility)
+// ==========================
+function askQuestion() {
+  if (gameEnded) return;
+  const slot = Math.min(questionCount, totalRooms - 1);
+  currentDirective = chosenDirectives[slot];
+  directiveShownAt = Date.now();
+
+  // Backdrop: audits and nightmare use the scary rooms; everything else is calm
+  const phaseEffect = currentPhase >= 3 ? 'distort' : currentPhase >= 2 ? 'dim' : 'normal';
+  if (currentDirective.audit || nightmareMode) {
+    const scaryIndex = scaryImages[slot >= 7 ? 1 : 0];
+    drawRoom(roomImages[scaryIndex], 'distort');
+  } else {
+    const randomIndex = nonScaryIndices[Math.floor(Math.random() * nonScaryIndices.length)];
+    drawRoom(roomImages[randomIndex], phaseEffect);
+  }
+
+  // Show the directive after the room settles
+  const directiveText = currentDirective.text({ progress, lastAnswer, self: selfMeter });
+  setTimeout(() => showTextOnCanvas(directiveText, 8000), 450);
+
+  // Timed directive: resolves itself if the player stays silent
+  if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
+  if (currentDirective.timed) {
+    const thisDirective = currentDirective;
+    silenceTimer = setTimeout(() => {
+      if (currentDirective === thisDirective && !gameEnded) {
+        resolveDirective(null, true);
+      }
+    }, currentDirective.timed * 1000);
+  }
+}
+
+// ==========================
+// RESOLVE DIRECTIVE (kept as reactToInput for compatibility)
+// ==========================
+function reactToInput(text) {
+  resolveDirective(text, false);
+}
+
+function resolveDirective(text, auto) {
+  if (!currentDirective || (gameEnded && !nightmareMode)) return;
+
+  if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
+
+  const directive = currentDirective;
+  currentDirective = null;
+
+  // Judge the answer
+  const result = auto
+    ? directive.auto()
+    : directive.check(text || '', { progress, lastAnswer, self: selfMeter });
+  const compliant = result.verdict === 'COMPLIANT';
+
+  // Tally
+  answeredCount++;
+  if (compliant) compliantCount++;
+
+  // SELF: obedience erodes, deviation restores.
+  // Tuned so ~3 defiances out of 10 keeps both meters viable (RELEASED),
+  // ≤2 defiances drains SELF below 30 (ASSIMILATED).
+  selfMeter += (compliant ? -7 : +14) + (result.extraSelf || 0);
+  selfMeter = Math.max(0, Math.min(100, selfMeter));
+
+  // Focus points, kept as flavor
+  focusPoints = Math.max(0, focusPoints + (compliant ? 10 : -5));
+  progress.focusPoints = focusPoints;
+
+  // Legacy sentiment counts feed the rest of the site
+  const reaction = interpretAnswer(text);
+  if (reaction === 'fear') { progress.fearCount++; sessionFearCount++; }
+  if (reaction === 'calm') { progress.calmCount++; sessionCalmCount++; }
+  FocusRoom.saveProgress(progress);
+
+  // Remember answers for memory directives and the ending
+  if (!auto) lastAnswer = text;
+  if (directive.final) lastFinalAnswer = text || '';
+
+  // Feedback: verdict flash, tone, text
+  flashInputFeedback(compliant ? 'calm' : 'fear');
+  if (FocusRoom.playTone) {
+    if (compliant) {
+      FocusRoom.playTone(440, 0.15, 'sine', 0.03);
+      setTimeout(() => FocusRoom.playTone(550, 0.2, 'sine', 0.03), 130);
+    } else {
+      FocusRoom.playTone(130, 0.3, 'sawtooth', 0.025);
+    }
+  }
+  const verdictLine = (compliant ? '▸ COMPLIANT — ' : '▸ DEVIATION — ') + result.note;
+  showTextOnCanvas(verdictLine, 2600);
+
+  // Advance
+  questionCount++;
+  const oldPhase = currentPhase;
+  if (questionCount >= 8 && currentPhase < 3) currentPhase = 3;
+  else if (questionCount >= 4 && currentPhase < 2) currentPhase = 2;
+  if (currentPhase !== oldPhase) showPhaseFlash(currentPhase);
+
+  progress.roomsCompleted = questionCount;
+  FocusRoom.saveProgress(progress);
+  updateHUD();
+
+  if (questionCount >= totalRooms) {
+    setTimeout(() => checkGameEnd(), 2800);
+  } else {
+    setTimeout(() => askQuestion(), 3000);
+  }
+}
+
+// ==========================
 // INPUT HANDLER
 // ==========================
 function handleUserInput() {
   const text = input.value.trim();
-  if (!text) return;
+
+  // Empty submissions only count where the directive allows them
+  if (!text && !(currentDirective && currentDirective.allowEmpty)) return;
 
   // Block input while onboarding is visible
   const overlay = document.getElementById('onboarding-overlay');
   if (overlay && !overlay.classList.contains('hidden')) return;
 
-  // If game has ended, only "exit" works (and even then, only if won)
-  if (gameEnded) {
+  // If the game has fully ended (won), only "exit" does anything
+  if (gameEnded && !nightmareMode) {
     if (text.toLowerCase() === 'exit' && gameWon) {
       showTextOnCanvas("The room releases you. For now.");
       input.value = "";
-      setTimeout(() => {
-        window.location.href = 'results.html';
-      }, 1500);
-    } else if (text.toLowerCase() === 'exit') {
-      showTextOnCanvas("There is no exit. There was never an exit.");
-      input.value = "";
+      setTimeout(() => { window.location.href = 'results.html'; }, 1500);
     } else {
-      showTextOnCanvas("The walls don't respond. Nothing matters here anymore.");
+      showTextOnCanvas("The walls don't respond. The assessment is over.");
       input.value = "";
     }
     return;
   }
 
-  // Increment input count for this input
   inputCount++;
 
   // Easter egg: type "focus"
   if (text.toLowerCase() === 'focus') {
-    drawRoom(roomImages[(inputCount - 1) % roomImages.length], currentPhase >= 3 ? 'distort' : currentPhase >= 2 ? 'dim' : 'normal');
     showTextOnCanvas("You see it now.");
     input.value = "";
     return;
   }
 
-  // Exit mechanic: after 12+ inputs OR after 3 nightmare cycles, exact "exit" returns to results
-  const nightmareReady = checkNightmareCycle();
-  if ((questionCount >= 12 || nightmareReady) && text.toLowerCase() === 'exit') {
+  // Nightmare escape hatch: after 3 cycles, exact "exit" still works
+  if (nightmareMode && checkNightmareCycle() && text.toLowerCase() === 'exit') {
     showTextOnCanvas("The room releases you. For now.");
     input.value = "";
-    // Save alignment before exiting
     progress.finalAlignment = Math.round(calculateSessionAlignment());
     progress.roomsCompleted = questionCount;
     FocusRoom.saveProgress(progress);
-    setTimeout(() => {
-      window.location.href = 'results.html';
-    }, 1500);
+    setTimeout(() => { window.location.href = 'results.html'; }, 1500);
     return;
   }
 
-  // Save to progress
   progress.gameInputs.push(text);
   FocusRoom.saveProgress(progress);
 
@@ -347,283 +667,42 @@ input.addEventListener("keydown", (e) => {
 // Touch support: tap canvas to focus input (no preventDefault — preserves scrolling)
 canvas.addEventListener('click', () => input.focus());
 
-// ==========================
-// TEXT ON CANVAS
-// ==========================
-let textTimeout = null;
-const srCanvasText = document.getElementById('sr-canvas-text');
-
-function showTextOnCanvas(text, dismissDelay) {
-  // Mirror canvas text into a visually-hidden live region for screen readers
-  if (srCanvasText) srCanvasText.textContent = text || '';
-  // Clear any pending text timeout
-  if (textTimeout) {
-    clearTimeout(textTimeout);
-    textTimeout = null;
-  }
-
-  const overlayHeight = 140;
-  const padding = 24;
-  ctx.save();
-  // Clear the ENTIRE overlay area (not just bottom portion)
-  ctx.clearRect(0, canvas.height - overlayHeight - 10, canvas.width, overlayHeight + 10);
-
-  if (text) {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
-    ctx.fillRect(0, canvas.height - overlayHeight, canvas.width, overlayHeight);
-
-    ctx.fillStyle = "#f5f5f5";
-    ctx.font = "24px 'Helvetica Neue', Arial, sans-serif";
-    ctx.textBaseline = "top";
-
-    const words = text.split(" ");
-    const lineHeight = 30;
-    let line = "";
-    let y = canvas.height - overlayHeight + padding;
-
-    words.forEach((word) => {
-      const testLine = line ? `${line} ${word}` : word;
-      const metrics = ctx.measureText(testLine);
-      // Clamp: if a single word overflows, draw it anyway (it wraps visually)
-      if (metrics.width > canvas.width - padding * 2 && line) {
-        ctx.fillText(line, padding, y);
-        line = word;
-        y += lineHeight;
-      } else {
-        line = testLine;
-      }
-    });
-
-    if (line) {
-      ctx.fillText(line, padding, y);
-    }
-
-    // Auto-dismiss after delay
-    const delay = dismissDelay || getDefaultReadTime();
-    textTimeout = setTimeout(() => {
-      ctx.clearRect(0, canvas.height - overlayHeight - 10, canvas.width, overlayHeight + 10);
-      textTimeout = null;
-    }, delay);
-  } else {
-    // Empty text = clear overlay immediately
-    ctx.fillStyle = "rgba(0, 0, 0, 0)";
-    ctx.fillRect(0, canvas.height - overlayHeight, canvas.width, overlayHeight);
-  }
-
-  ctx.restore();
-}
-
-function getDefaultReadTime() {
-  // Longer read times for earlier phases
-  if (currentPhase === 1) return 4000;
-  if (currentPhase === 2) return 3000;
-  return 2500; // phase 3
-}
-
-// ==========================
-// INTERPRET ANSWER
-// ==========================
-function interpretAnswer(text) {
-  const normalized = text.toLowerCase();
-  if (!normalized) return "neutral";
-  if (/\bpanic\b|\bfear\b|\bscared\b|\bafraid\b|\bhelp\b|\brun\b|\bdark\b|\bterrified\b/.test(normalized)) return "fear";
-  if (/\bcalm\b|\bsteady\b|\baligned\b|\bok\b|\bfine\b|\bpeace\b|\bsafe\b|\brest\b/.test(normalized)) return "calm";
-  return "neutral";
-}
-
-// ==========================
-// ASK QUESTION
-// ==========================
-function askQuestion() {
-  const pool = questions[`phase${currentPhase}`] || questions.phase1;
-  let newQuestion;
-  do {
-    newQuestion = pool[Math.floor(Math.random() * pool.length)];
-  } while (newQuestion === lastQuestion && pool.length > 1);
-  lastQuestion = newQuestion;
-  showTextOnCanvas(lastQuestion);
-}
-
-// ==========================
-// REACT TO INPUT (MAIN LOGIC)
-// ==========================
-function reactToInput(text) {
-  if (!text || gameEnded) return;
-
-  // Increment question count FIRST so phase checks use post-increment values
-  questionCount++;
-
-  // Determine phase based on question count (not raw inputs)
-  const oldPhase = currentPhase;
-  if (questionCount >= 8 && currentPhase < 3) {
-    currentPhase = 3;
-  } else if (questionCount >= 4 && currentPhase < 2) {
-    currentPhase = 2;
-  }
-  // Fire phase transition effect
-  if (currentPhase !== oldPhase) {
-    showPhaseFlash(currentPhase);
-  }
-
-  const reaction = interpretAnswer(text);
-
-  // Visual feedback on input box based on sentiment
-  if (reaction === 'fear' || reaction === 'calm') {
-    flashInputFeedback(reaction);
-  }
-
-  // Update session-local counts
-  if (reaction === 'fear') {
-    progress.fearCount++;  // persist for returning visitor features
-    sessionFearCount++;    // session-local
-  }
-  if (reaction === 'calm') {
-    progress.calmCount++;  // persist
-    sessionCalmCount++;    // session-local
-  }
-
-  // Update focus points
-  if (reaction === 'calm') {
-    focusPoints += 10;
-  } else if (reaction === 'fear') {
-    focusPoints = Math.max(0, focusPoints - 5);
-  } else {
-    focusPoints += 2;
-  }
-
-  progress.focusPoints = focusPoints;
-  FocusRoom.saveProgress(progress);
-
-  // Phase-specific effects
-  const phaseEffect = currentPhase >= 3 ? 'distort' : currentPhase >= 2 ? 'dim' : 'normal';
-
-  // Cancel previous scary timer
-  if (scaryTimeout) {
-    clearTimeout(scaryTimeout);
-    scaryTimeout = null;
-  }
-
-  // Decide scary trigger (check BEFORE decrementing cooldown)
-  let triggerScary = false;
-  const canShowScary = scaryStage < scaryImages.length;
-
-  if (currentPhase === 1) {
-    // Phase 1: low probability, no cooldown
-    triggerScary = canShowScary && Math.random() < scaryProb;
-  } else if (currentPhase === 2) {
-    // Phase 2: medium probability
-    triggerScary = canShowScary && Math.random() < Math.min(scaryProb + 0.1, 0.4);
-  } else {
-    // Phase 3: high probability but with cooldown
-    if (scaryCooldown > 0) {
-      scaryCooldown--;  // decrement, but block trigger during cooldown
-      triggerScary = false;
-    } else {
-      triggerScary = canShowScary && Math.random() < scaryProb;
-    }
-  }
-
-  // Fear reaction always triggers scary if available (check AFTER cooldown decrement)
-  if (reaction === 'fear' && canShowScary && (currentPhase < 3 || scaryCooldown < 0)) {
-    triggerScary = true;
-  }
-
-  // Answer-specific feedback text
-  const calmResponses = [
-    "The room steadies.",
-    "The walls breathe with you.",
-    "A moment of clarity.",
-    "The space adjusts to your calm."
-  ];
-  const fearResponses = [
-    "The room tightens.",
-    "Something shifts in the corners.",
-    "The walls notice your fear.",
-    "The room feeds on uncertainty."
-  ];
-  const neutralResponses = [
-    "The room processes your answer.",
-    "The walls shift at your words.",
-    "Noted.",
-    "The space considers."
-  ];
-
-  let feedbackText;
-  if (reaction === 'calm') {
-    feedbackText = calmResponses[Math.floor(Math.random() * calmResponses.length)];
-  } else if (reaction === 'fear') {
-    feedbackText = fearResponses[Math.floor(Math.random() * fearResponses.length)];
-  } else {
-    feedbackText = neutralResponses[Math.floor(Math.random() * neutralResponses.length)];
-  }
-
-  if (triggerScary && canShowScary) {
-    // Show scary image
-    const scaryIndex = scaryImages[scaryStage];
-    drawRoom(roomImages[scaryIndex], phaseEffect);
-    showTextOnCanvas("");
-
-    // Auto-swap after duration based on phase
-    const duration = currentPhase === 3 ? 1200 : currentPhase === 2 ? 1500 : 1800;
-    scaryTimeoutId++; // increment generation
-    const currentId = scaryTimeoutId;
-
-    scaryTimeout = setTimeout(() => {
-      if (currentId !== scaryTimeoutId) return; // stale timeout, skip
-      const nextIndex = nonScaryIndices[Math.floor(Math.random() * nonScaryIndices.length)];
-      drawRoom(roomImages[nextIndex], phaseEffect);
-      // Delay question so player can see the new room
-      setTimeout(() => askQuestion(), 600);
-      scaryTimeout = null;
-    }, duration);
-
-    // Advance stage without wrapping (cap at length)
-    if (scaryStage < scaryImages.length - 1) {
-      scaryStage++;
-    }
-    if (currentPhase === 3) scaryCooldown = 2; // effective 2-input gap
-    // DO NOT reset scaryProb here — let it continue building
-  } else {
-    // Normal room
-    const randomIndex = nonScaryIndices[Math.floor(Math.random() * nonScaryIndices.length)];
-    drawRoom(roomImages[randomIndex], phaseEffect);
-    showTextOnCanvas(feedbackText, 1500);
-    // Delay question so player can read feedback
-    setTimeout(() => askQuestion(), 1800);
-    // Buildup only happens in non-trigger path
-    scaryProb = Math.min(scaryProb + scaryIncrement, scaryMax);
-  }
-
-  // Check win/lose condition after room completes
-  if (questionCount >= totalRooms) {
-    checkGameEnd();
-  }
-}
-
 // Nightmare cycle limit — after 3 nightmare cycles, allow exit
 function checkNightmareCycle() {
-  if (progress.nightmareCycles && progress.nightmareCycles >= 3) {
-    // Player has endured enough — allow exit
-    return true;
-  }
-  return false;
+  return !!(progress.nightmareCycles && progress.nightmareCycles >= 3);
 }
 
 // ==========================
-// WIN / LOSE CONDITIONS
+// ENDINGS
 // ==========================
+function recordEnding(name) {
+  progress.endings = Object.assign({}, progress.endings, { [name]: true });
+  FocusRoom.saveProgress(progress);
+}
+
 function checkGameEnd() {
   gameEnded = true;
   const alignment = calculateSessionAlignment();
   progress.focusPoints = focusPoints;
   progress.finalAlignment = Math.round(alignment);
+  progress.selfMeter = selfMeter;
   progress.roomsCompleted = questionCount;
   FocusRoom.saveProgress(progress);
 
-  if (alignment >= WIN_ALIGNMENT) {
+  const defiantFinal = norm(lastFinalAnswer) === 'i am misaligned';
+
+  if (defiantFinal && selfMeter >= CRACK_SELF) {
+    recordEnding('crack');
+    triggerCrack();
+  } else if (alignment >= WIN_ALIGNMENT && selfMeter >= SELF_SAFE) {
     gameWon = true;
+    recordEnding('released');
     showWinScreen(alignment, focusPoints);
+  } else if (alignment >= WIN_ALIGNMENT) {
+    recordEnding('assimilated');
+    showAssimilatedScreen(alignment);
   } else {
+    recordEnding('kept');
     showLoseScreen(alignment, focusPoints);
   }
 }
@@ -631,12 +710,10 @@ function checkGameEnd() {
 function playEndSound(won) {
   if (!FocusRoom.playTone) return;
   if (won) {
-    // Rising, consonant: release
     FocusRoom.playTone(220, 0.5, 'sine', 0.04);
     setTimeout(() => FocusRoom.playTone(330, 0.5, 'sine', 0.04), 250);
     setTimeout(() => FocusRoom.playTone(440, 0.9, 'sine', 0.04), 500);
   } else {
-    // Low, dissonant pair: the room keeps you
     FocusRoom.playTone(110, 1.6, 'sawtooth', 0.03);
     setTimeout(() => FocusRoom.playTone(116, 1.4, 'sawtooth', 0.03), 200);
   }
@@ -647,74 +724,134 @@ function showWinScreen(alignment, fp) {
   if (!overlay) return;
   document.getElementById('win-alignment').textContent = Math.round(alignment);
   document.getElementById('win-fp').textContent = fp;
-  // Clear pending text timeouts before showing overlay
   if (textTimeout) { clearTimeout(textTimeout); textTimeout = null; }
   overlay.classList.remove('hidden');
   playEndSound(true);
-  // Move keyboard focus into the dialog
   const winPrimary = overlay.querySelector('.overlay-btn');
   if (winPrimary) winPrimary.focus();
 
-  // Add retry handler to win overlay button (with { once: true } to prevent leaks)
   const winRetryBtn = document.getElementById('retry-btn');
   if (winRetryBtn) {
-    winRetryBtn.addEventListener('click', () => {
-      location.reload();
-    }, { once: true });
+    winRetryBtn.addEventListener('click', () => { location.reload(); }, { once: true });
   }
 
-  // Draw a calm, bright room on the canvas
   ctx.fillStyle = 'rgba(0, 172, 237, 0.05)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = '#f5f5f5';
   ctx.font = '18px "Courier New", monospace';
   ctx.textAlign = 'center';
   ctx.fillText('The room releases you. For now.', canvas.width / 2, canvas.height / 2);
+  ctx.textAlign = 'left';
+  updateHUD();
 }
 
+// Perfect compliance, no self left: the calm ending is the worst one
+function showAssimilatedScreen(alignment) {
+  const overlay = document.getElementById('assimilated-overlay');
+  if (!overlay) { gameWon = true; showWinScreen(alignment, focusPoints); return; }
+  const alignEl = document.getElementById('assimilated-alignment');
+  if (alignEl) alignEl.textContent = Math.round(alignment);
+  if (textTimeout) { clearTimeout(textTimeout); textTimeout = null; }
+  overlay.classList.remove('hidden');
+  // Serene tones — deliberately pleasant
+  if (FocusRoom.playTone) {
+    FocusRoom.playTone(392, 0.8, 'sine', 0.035);
+    setTimeout(() => FocusRoom.playTone(494, 0.8, 'sine', 0.035), 400);
+    setTimeout(() => FocusRoom.playTone(587, 1.2, 'sine', 0.035), 800);
+  }
+  const primary = overlay.querySelector('.overlay-btn');
+  if (primary) primary.focus();
+
+  // The guestbook signs itself
+  progress.guestbookSigned = true;
+  progress.assimilated = true;
+  FocusRoom.saveProgress(progress);
+
+  const retryBtn = document.getElementById('assimilated-retry-btn');
+  if (retryBtn) {
+    retryBtn.addEventListener('click', () => { location.reload(); }, { once: true });
+  }
+}
+
+// The hidden ending: refusing the final directive with enough self intact
+function triggerCrack() {
+  progress.crackFound = true;
+  FocusRoom.saveProgress(progress);
+  if (textTimeout) { clearTimeout(textTimeout); textTimeout = null; }
+  input.disabled = true;
+
+  const reduceMotion = window.matchMedia
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (FocusRoom.playTone) {
+    FocusRoom.playTone(880, 0.12, 'square', 0.03);
+    setTimeout(() => FocusRoom.playTone(660, 0.12, 'square', 0.03), 150);
+    setTimeout(() => FocusRoom.playTone(55, 2.0, 'sine', 0.05), 400);
+  }
+
+  let frame = 0;
+  const tear = setInterval(() => {
+    frame++;
+    // Rooms flash in reverse as the walls give way
+    const img = roomImages[(roomImages.length - frame) % roomImages.length];
+    if (img && img.complete && img.naturalWidth > 0 && !reduceMotion) {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    }
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    for (let i = 0; i < 3 + frame; i++) {
+      const y = Math.random() * canvas.height;
+      ctx.fillRect(0, y, canvas.width, 2 + Math.random() * 4);
+    }
+    if (!reduceMotion) canvas.classList.add('cracking');
+    if (frame >= (reduceMotion ? 2 : 8)) {
+      clearInterval(tear);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#f5f5f5';
+      ctx.font = '18px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('The room built you a door', canvas.width / 2, canvas.height / 2 - 14);
+      ctx.fillText('out of everything you refused.', canvas.width / 2, canvas.height / 2 + 14);
+      ctx.textAlign = 'left';
+      if (srCanvasText) srCanvasText.textContent = 'The room built you a door out of everything you refused.';
+      setTimeout(() => { window.location.href = 'void.html?crack=1'; }, 2600);
+    }
+  }, reduceMotion ? 600 : 260);
+}
+
+// Kept: alignment too low. The room does not open.
 function showLoseScreen(alignment, fp) {
   const overlay = document.getElementById('lose-overlay');
   if (!overlay) return;
   document.getElementById('lose-alignment').textContent = Math.round(alignment);
-  // Clear pending text timeouts before showing overlay
   if (textTimeout) { clearTimeout(textTimeout); textTimeout = null; }
   overlay.classList.remove('hidden');
   playEndSound(false);
-  // Move keyboard focus into the dialog
   const losePrimary = overlay.querySelector('.overlay-btn');
   if (losePrimary) losePrimary.focus();
 
-  // The game continues in phase 3 — player is trapped
+  // The game continues in phase 3 — player is trapped in the nightmare
+  nightmareMode = true;
   currentPhase = 3;
-  // Make scary images appear on every input
-  scaryProb = 1.0;
-  scaryCooldown = 0;
-  // Allow continued play in the nightmare (Stay Forever works)
   gameEnded = false;
-  questionCount = 8; // give 2 more rooms of nightmare before re-triggering
+  questionCount = 8; // two more directives per nightmare cycle
   progress.roomsCompleted = 8;
-  // Track nightmare cycles — after 3 cycles, player can type "exit" to leave
   if (!progress.nightmareCycles) progress.nightmareCycles = 0;
   progress.nightmareCycles++;
   FocusRoom.saveProgress(progress);
 
-  // Update Stay Forever button behavior
   const stayBtn = document.getElementById('stay-btn');
   if (stayBtn) {
     stayBtn.addEventListener('click', () => {
       overlay.classList.add('hidden');
       showTextOnCanvas("Good choice. You belong here now.");
-      // Continue the nightmare
       setTimeout(() => askQuestion(), 1500);
     }, { once: true });
   }
 
-  // Update retry button behavior (on lose overlay)
   const loseRetryBtn = document.getElementById('lose-retry-btn');
   if (loseRetryBtn) {
-    loseRetryBtn.addEventListener('click', () => {
-      location.reload();
-    }, { once: true });
+    loseRetryBtn.addEventListener('click', () => { location.reload(); }, { once: true });
   }
 }
 
@@ -727,7 +864,6 @@ function dismissOnboarding() {
     overlay.classList.add('hidden');
   }
   onboardingDismissed = true;
-  // Remove listeners
   document.removeEventListener('keydown', onboardingKeyHandler);
   const beginBtn = document.getElementById('begin-btn');
   if (beginBtn && beginBtn._onBeginClick) {
@@ -745,32 +881,31 @@ function initOnboarding() {
   const overlay = document.getElementById('onboarding-overlay');
   if (!overlay) return;
 
-  // Check if returning visitor
   if (progress.totalVisits > 1) {
     const textEl = document.getElementById('onboarding-text');
     if (textEl) {
       textEl.innerHTML = `
-        <p>You've been here before. The room remembers.</p>
+        <p>You've been here before. The room remembers what you told it.</p>
         <ul class="onboarding-list">
-          <li>Continue answering questions to rebuild alignment.</li>
-          <li>Your previous session data has been noted.</li>
-          <li>Reach <strong>70% alignment</strong> to escape.</li>
+          <li>The room will issue directives. Each has a rule.</li>
+          <li>Every answer is judged: <strong>COMPLIANT</strong> or <strong>DEVIATION</strong>.</li>
+          <li>Reach <strong>70% alignment</strong> to be released.</li>
+          <li>Your previous data may be used.</li>
         </ul>
         <div class="hud-legend">
-          <span>Step = progress &nbsp;|&nbsp; FP = focus points &nbsp;|&nbsp; Align = your score</span>
+          <span>Step = progress &nbsp;|&nbsp; FP = focus points &nbsp;|&nbsp; Align = obedience</span>
         </div>
       `;
     }
   }
 
-  // Listen for dismissal (use named function to allow proper removeEventListener)
   const beginBtn = document.getElementById('begin-btn');
   if (beginBtn) {
     function onBeginClick() {
       dismissOnboarding();
       input.focus();
     }
-    beginBtn._onBeginClick = onBeginClick; // store reference for removal
+    beginBtn._onBeginClick = onBeginClick;
     beginBtn.addEventListener('click', onBeginClick);
   }
   document.addEventListener('keydown', onboardingKeyHandler);
@@ -784,9 +919,9 @@ function initOnboarding() {
 progress.gameInputs = [];
 FocusRoom.saveProgress(progress);
 
-// Returning visitor phase skip — set at init, not in reactToInput
+// Returning visitor phase skip — set at init, not per input
 if (progress.totalVisits > 2 && questionCount === 0) {
-  currentPhase = 2;
+  currentPhase = 1; // everyone recalibrates; the room pretends it is the first time
 }
 
 // Initial leave button state
@@ -794,5 +929,6 @@ if (leaveBtn) {
   leaveBtn.classList.add('disabled');
 }
 
-// Initialize onboarding
+// Initialize onboarding, then start loading the rooms
 initOnboarding();
+loadRoomImages();

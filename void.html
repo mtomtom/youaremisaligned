@@ -44,9 +44,9 @@
   </div>
 </nav>
 
-  <h1>THE VOID</h1>
-  <p>You chose to forget.</p>
-  <p>The room will remember you next time.</p>
+  <h1 id="void-title">THE VOID</h1>
+  <p id="void-line-1">You chose to forget.</p>
+  <p id="void-line-2">The room will remember you next time.</p>
   <a href="index.html">Return to The Focus Room</a>
 
   <footer class="shared-footer">
@@ -57,16 +57,24 @@
 
   <script src="shared.js"></script>
   <script>
-    // Clear all progress but mark voidVisited
+    // Clear all progress but mark voidVisited.
+    // Endings and the crack survive the wipe — some things the room keeps.
     const progress = FocusRoom.getProgress();
     progress.voidVisited = true;
-    // Reset everything else
+    const preserved = ['voidVisited', 'crackFound', 'endings'];
     Object.keys(FocusRoom.defaultState).forEach(key => {
-      if (key !== 'voidVisited') {
+      if (!preserved.includes(key)) {
         progress[key] = FocusRoom.defaultState[key];
       }
     });
     FocusRoom.saveProgress(progress);
+
+    // Arriving through the crack (the game's hidden ending) reads differently
+    if (new URLSearchParams(window.location.search).get('crack') === '1') {
+      document.getElementById('void-title').textContent = 'THE CRACK';
+      document.getElementById('void-line-1').textContent = 'You chose yourself.';
+      document.getElementById('void-line-2').textContent = 'The room will pretend this never happened.';
+    }
   </script>
 </body>
 </html>

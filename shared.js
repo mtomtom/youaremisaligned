@@ -21,7 +21,11 @@
     voidVisited: false,
     konamiUnlocked: false,
     webmasterVisited: false,
-    totalVisits: 0
+    totalVisits: 0,
+    selfMeter: null,
+    assimilated: false,
+    crackFound: false,
+    endings: {}
   };
 
   function loadProgress() {
