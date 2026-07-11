@@ -132,10 +132,21 @@ function twistQuote(s) {
   return words.join(' ');
 }
 function auditSource() {
-  const fr = (progress.formResponses || []).find(r => r && r.value && r.value.trim().length > 2);
-  if (fr) return fr.value.trim();
+  const rs = progress.formResponses || [];
+  const usable = r => r && typeof r.value === 'string' && r.value.trim().length > 2 && !/^\d+$/.test(r.value.trim());
+  // Prefer answers the form wrote on the player's behalf — the audit cuts deepest
+  // when they genuinely don't remember writing it
+  const ghost = rs.find(r => usable(r) && r.selfFilled);
+  if (ghost) return { text: ghost.value.trim(), selfFilled: true };
+  const fr = rs.find(usable);
+  if (fr) return { text: fr.value.trim(), selfFilled: false };
   const gi = (progress.gameInputs || []).find(v => v && v.trim().length > 2);
-  return gi ? gi.trim() : null;
+  return gi ? { text: gi.trim(), selfFilled: false } : null;
+}
+function intakeName() {
+  const rs = progress.formResponses || [];
+  const named = rs.find(r => r && /name/i.test(r.field || '') && r.value && r.value.trim());
+  return named ? named.value.trim() : (rs[0]?.value || null);
 }
 
 // Verdict helpers: base SELF movement is -7 on compliance, +14 on deviation;
@@ -196,8 +207,11 @@ const directiveSlots = [
       text: () => {
         const src = auditSource();
         const intro = "A second measurement has always been running. Look at your readout. ";
+        if (src && src.selfFilled) {
+          return intro + `Our records: you told us "${src.text}". You do not remember writing this. CONFIRM or DENY.`;
+        }
         if (src) {
-          return intro + `Our records: you told us "${twistQuote(src)}". CONFIRM or DENY.`;
+          return intro + `Our records: you told us "${twistQuote(src.text)}". CONFIRM or DENY.`;
         }
         return intro + "Our records on you are empty. Confirm that you gave us nothing. CONFIRM or DENY.";
       },
@@ -234,13 +248,13 @@ const directiveSlots = [
   [
     {
       text: () => {
-        const name = progress.formResponses?.[0]?.value;
+        const name = intakeName();
         return name
           ? `Your intake form says "${name}". Type a different name.`
           : "Type a name that is not yours.";
       },
       check: (a) => {
-        const name = progress.formResponses?.[0]?.value;
+        const name = intakeName();
         if (name && norm(a) === norm(name)) {
           return D("You kept your name. The room wanted the other one.", +3);
         }
